@@ -336,17 +336,41 @@
     const wait = blockedUntil - Date.now();
     if (wait > 0) throw new RateLimited(Math.ceil(wait / 1000));
 
+    // CARTOS occasionally stalls on a random request for a minute or more while an identical repeat answers in
+    // well under a second. So: after 8 s of silence send one duplicate and take whichever answers first;
+    // give up cleanly at 45 s. This adds at most one extra request, and only to a stalled search.
+    const headers = { Accept: 'application/fhir+json' };
+    const first = new AbortController(), hedge = new AbortController();
+    const ceiling = setTimeout(() => { first.abort(); hedge.abort(); }, 45000);
+    let hedgeTimer = null;
     stats.requests++; renderStats();
-    let res;
-    try { res = await fetch(url, { headers: { Accept: 'application/fhir+json' } }); }
-    catch { setLive('err'); throw new Error('Could not reach CARTOS. Check your connection and try again.'); }
+    const p1 = fetch(url, { headers, signal: first.signal });
+    const p2 = new Promise((resolve, reject) => {
+      hedgeTimer = setTimeout(() => { stats.requests++; renderStats(); fetch(url, { headers, signal: hedge.signal }).then(resolve, reject); }, 8000);
+    });
+    let res, winner = null;
+    const tag = (p, who) => p.then(r => { if (!winner) winner = who; return r; });
+    try { res = await Promise.race([tag(p1, 'first'), tag(p2, 'hedge')]); }
+    catch (e) {
+      clearTimeout(ceiling);
+      if (e && e.name === 'AbortError') throw new Error('CARTOS took more than 45 seconds to answer. It is having a slow moment; try again shortly.');
+      setLive('err'); throw new Error('Could not reach CARTOS. Check your connection and try again.');
+    }
+    finally {
+      clearTimeout(hedgeTimer);
+      // Cancel only the copy that lost; the winner's body still has to be read. Aborting a request that never started is harmless.
+      if (winner === 'first') hedge.abort();
+      if (winner === 'hedge') first.abort();
+    }
     if (res.status === 429) {
+      clearTimeout(ceiling);
       const ra = parseInt(res.headers.get('Retry-After') || '30', 10);
       blockedUntil = Date.now() + ra * 1000;
       setLive('warn');
       throw new RateLimited(ra);
     }
-    const body = await res.json().catch(() => null);
+    let body = null;
+    try { body = await res.json(); } catch { body = null; } finally { clearTimeout(ceiling); }
     if (!res.ok && !(body && body.resourceType === 'OperationOutcome')) throw new Error(`CARTOS returned HTTP ${res.status}.`);
     setLive('live');
     mem.set(url, body); // a "not found" OperationOutcome is a stable answer too

@@ -55,6 +55,10 @@ Base URL: `https://cartos.healthit.gov/TerminologyServer/R4`.
   loaded. The page falls back to `$validate-code` against the US Core lab value set, which answers
   in under a second and returns the display name.
 - A hyphenated code used as an `$expand` filter takes CARTOS about 13 seconds. Avoid it.
+- CARTOS intermittently stalls on a random request for a minute or more while an identical repeat
+  answers in under a second (seen 2026-09-02 afternoon, not tied to URL form, origin, or cache).
+  The page sends one duplicate after 8 seconds of silence, takes the first answer, and gives up
+  at 45 seconds with a plain message.
 - A lookup miss is an HTTP 400 with an OperationOutcome body. The browser console logs each one as
   a failed resource load; that is expected and harmless.
 - Whole-vocabulary text search is not exposed; searching goes through value sets, so a valid code
