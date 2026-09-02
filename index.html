@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health Code Decoder</title>
+<meta name="description" content="Type a word and see how it appears across the vocabularies inside US health records, or paste a code from a medical bill, lab report, or shot record and see what it means. Powered by ONC CARTOS.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #1c2330;
+    --muted: #5d6673;
+    --line: #dfe3e8;
+    --accent: #0b5fa5;
+    --accent-ink: #ffffff;
+    --chip: #eef2f7;
+    --ok: #1a7f4b;
+    --warn: #a15c00;
+    --err: #b3261e;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121519;
+      --panel: #1b2027;
+      --ink: #e7eaee;
+      --muted: #9aa4b1;
+      --line: #2c343e;
+      --accent: #6db3f2;
+      --accent-ink: #0b1420;
+      --chip: #242b34;
+      --ok: #5fcf8a;
+      --warn: #f0b35a;
+      --err: #ff8a80;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.45; }
+  a { color: var(--accent); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header p.lede { margin: 0 0 18px; color: var(--muted); }
+
+  .searchbar { display: flex; gap: 8px; }
+  .searchbar input {
+    flex: 1; font: inherit; font-size: 1.15rem; padding: 12px 14px; min-width: 0;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); outline: none;
+  }
+  .searchbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .searchbar button {
+    font: inherit; font-weight: 600; padding: 12px 18px; border-radius: 10px; border: 0;
+    background: var(--accent); color: var(--accent-ink); cursor: pointer;
+  }
+  .row-chips { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+  .chip {
+    font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--chip); color: var(--ink); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .status { margin: 12px 0 0; min-height: 1.4em; color: var(--muted); font-size: 0.9rem; }
+  .status.err { color: var(--err); }
+  .status.warn { color: var(--warn); }
+
+  section.group { margin-top: 22px; }
+  section.group h2 { font-size: 1.05rem; margin: 0 0 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  section.group h2 .count { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+  section.group p.about { margin: 0 0 8px; color: var(--muted); font-size: 0.9rem; }
+  p.note { margin: 6px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .card.exact { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+  .card + .card { margin-top: 10px; }
+  .card .top { display: flex; align-items: flex-start; gap: 10px; }
+  .card .display { font-size: 1.25rem; font-weight: 600; margin: 0 0 6px; flex: 1; }
+  .card .meta { color: var(--muted); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+  .copy { font: inherit; font-size: 0.8rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .code { font-family: var(--mono); font-size: 0.95em; background: var(--chip); padding: 1px 6px; border-radius: 6px; }
+  .tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+  .tag.inactive { color: var(--warn); }
+  dl.props { margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 0.9rem; }
+  dl.props dt { color: var(--muted); }
+  dl.props dd { margin: 0; }
+  details { margin-top: 10px; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
+  pre { margin: 8px 0 0; padding: 10px; background: var(--chip); border-radius: 8px; overflow-x: auto; font-size: 0.8rem; max-height: 320px; }
+
+  ul.results { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  ul.results li { border-top: 1px solid var(--line); }
+  ul.results li:first-child { border-top: 0; }
+  ul.results li button.row {
+    all: unset; cursor: pointer; width: 100%; display: grid; grid-template-columns: minmax(90px, max-content) 1fr auto;
+    gap: 10px; align-items: center; padding: 9px 14px; box-sizing: border-box;
+  }
+  ul.results li button.row:hover, ul.results li button.row:focus-visible { background: color-mix(in srgb, var(--accent) 8%, var(--panel)); }
+  ul.results .disp { overflow-wrap: anywhere; }
+  .more { margin-top: 8px; }
+  .more button { font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .empty { color: var(--muted); font-size: 0.95rem; padding: 6px 2px; }
+  .none { margin-top: 22px; color: var(--muted); font-size: 0.9rem; }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; }
+  footer p { margin: 6px 0; }
+  .hidden { display: none !important; }
+  @media (max-width: 560px) {
+    ul.results li button.row { grid-template-columns: 1fr; gap: 2px; }
+    .searchbar button { padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Health Code Decoder</h1>
+    <p class="lede">Type a word like <em>asthma</em> and see how it shows up across the vocabularies inside US health records. Or paste a code from a medical bill, lab report, or shot record and see what it stands for.</p>
+  </header>
+
+  <form class="searchbar" id="form" autocomplete="off">
+    <input id="q" type="search" placeholder="A word like diabetes, metformin, glucose — or a code like E11.9, 208, 73211009" aria-label="Word or code to look up" autofocus>
+    <button type="submit">Look up</button>
+  </form>
+  <div class="row-chips" id="cats" role="group" aria-label="Narrow results to one kind of record">Narrow to:</div>
+  <div class="row-chips" id="examples">Try:</div>
+  <div class="status" id="status" aria-live="polite"></div>
+
+  <main id="out"></main>
+
+  <footer>
+    <p><strong>Where this comes from.</strong> Every result is fetched live from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a>, the free public terminology service run by the US Office of the National Coordinator for Health IT. Nothing you type is stored anywhere except your own browser for this visit.</p>
+    <p><strong>This is a terminology lookup, not medical interpretation.</strong> A code's official label is the name a computer system uses for it. It is not a diagnosis, a recommendation, or an explanation of your care. Ask your clinician about anything on your records.</p>
+    <p><strong>What it covers.</strong> Searches go through the US Core value sets for conditions, medications, lab tests, and procedures, plus the CDC vaccine list. A code that is missing here may still be valid; it may simply be outside those lists or in a code set CARTOS does not carry, such as CPT, HCPCS, or NDC.</p>
+    <p><strong>Attributions.</strong> SNOMED CT is © SNOMED International; the US Edition is distributed by the National Library of Medicine. LOINC is © Regenstrief Institute, Inc. RxNorm is produced by the National Library of Medicine. ICD-10-CM is maintained by the CDC National Center for Health Statistics. CVX is maintained by the CDC. Each is used here under its steward's terms.</p>
+    <p><strong>Be gentle.</strong> CARTOS is a shared service with a limit of about 2,000 requests per 5 minutes per address. This page waits between keystrokes, reuses answers it already has, and pauses when told to slow down.</p>
+    <p id="stats"></p>
+    <p>A hobby project. <a href="https://github.com/jbrick2070/health-code-decoder" target="_blank" rel="noopener">Source on GitHub</a>. Not affiliated with ONC or any vocabulary steward.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Configuration ----------
+  const BASE = 'https://cartos.healthit.gov/TerminologyServer/R4';
+  const PAGE = 20;
+  const CVX_CACHE_KEY = 'cartos:cvx:v1';
+  const CVX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+  const SYSTEMS = {
+    icd10cm: { key: 'icd10cm', url: 'http://hl7.org/fhir/sid/icd-10-cm', name: 'ICD-10-CM',
+      about: 'Diagnosis codes used on US medical bills and insurance claims. Maintained by the CDC National Center for Health Statistics.' },
+    sct: { key: 'sct', url: 'http://snomed.info/sct', name: 'SNOMED CT',
+      about: 'The clinical vocabulary inside electronic health records for problems, findings, and procedures.' },
+    loinc: { key: 'loinc', url: 'http://loinc.org', name: 'LOINC',
+      about: 'Codes for lab tests, vital signs, and other clinical measurements. Maintained by the Regenstrief Institute.' },
+    rxnorm: { key: 'rxnorm', url: 'http://www.nlm.nih.gov/research/umls/rxnorm', name: 'RxNorm',
+      about: 'Standard names and codes for medications in the US. Maintained by the National Library of Medicine.' },
+    cvx: { key: 'cvx', url: 'http://hl7.org/fhir/sid/cvx', name: 'CVX',
+      about: "The CDC's codes for vaccines, used on immunization records." }
+  };
+  const systemByUrl = Object.fromEntries(Object.values(SYSTEMS).map(s => [s.url, s]));
+
+  // Searchable groups, in the order they are always shown. Each value set was verified to support `filter` on CARTOS.
+  const GROUPS = [
+    { key: 'conditions', title: 'Conditions and diagnoses', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-condition-code',
+      systems: ['icd10cm', 'sct'], about: 'SNOMED CT problems and ICD-10-CM billing diagnoses.' },
+    { key: 'meds', title: 'Medications', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-medication-codes',
+      systems: ['rxnorm'], about: 'RxNorm drug names, strengths, and forms. Search by ingredient or brand, not by the condition it treats.' },
+    { key: 'labs', title: 'Lab tests and measurements', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-laboratory-test-codes',
+      systems: ['loinc'], about: 'LOINC codes for lab tests.' },
+    { key: 'procedures', title: 'Procedures', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-code',
+      systems: ['sct'], about: 'SNOMED CT procedures.' },
+    { key: 'vaccines', title: 'Vaccines', local: true,
+      systems: ['cvx'], about: 'CDC CVX vaccine codes. This list is small, so it is downloaded once and searched on your device.' }
+  ];
+  const CATS = [{ key: 'all', label: 'Everything' }].concat(GROUPS.map(g => ({ key: g.key, label: g.title.split(' and ')[0] })));
+  const EXAMPLES = ['diabetes', 'E11.9', 'metformin', '208', 'glucose', '73211009', 'appendectomy', 'B12'];
+
+  // ---------- Small helpers ----------
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null) continue;
+      if (k === 'class') n.className = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    }
+    for (const kid of kids) if (kid != null) n.append(kid);
+    return n;
+  };
+
+  const stats = { requests: 0, cacheHits: 0 };
+  function renderStats() {
+    $('#stats').textContent = `This visit: ${stats.requests} live request${stats.requests === 1 ? '' : 's'} to CARTOS, ${stats.cacheHits} answered from memory.`;
+  }
+
+  // ---------- Session cache and rate-limit awareness ----------
+  const mem = new Map();
+  let blockedUntil = 0;
+
+  class RateLimited extends Error {
+    constructor(seconds) { super(`CARTOS asked this page to slow down. Try again in about ${seconds} seconds.`); this.seconds = seconds; }
+  }
+
+  async function fhir(path, params) {
+    const qs = new URLSearchParams(params).toString();
+    const url = `${BASE}/${path}${qs ? '?' + qs : ''}`;
+    if (mem.has(url)) { stats.cacheHits++; renderStats(); return mem.get(url); }
+    const wait = blockedUntil - Date.now();
+    if (wait > 0) throw new RateLimited(Math.ceil(wait / 1000));
+
+    stats.requests++; renderStats();
+    let res;
+    try { res = await fetch(url, { headers: { Accept: 'application/fhir+json' } }); }
+    catch { throw new Error('Could not reach CARTOS. Check your connection and try again.'); }
+    if (res.status === 429) {
+      const ra = parseInt(res.headers.get('Retry-After') || '30', 10);
+      blockedUntil = Date.now() + ra * 1000;
+      throw new RateLimited(ra);
+    }
+    const body = await res.json().catch(() => null);
+    if (!res.ok && !(body && body.resourceType === 'OperationOutcome')) throw new Error(`CARTOS returned HTTP ${res.status}.`);
+    mem.set(url, body); // a "not found" OperationOutcome is a stable answer too
+    return body;
+  }
+
+  function setStatus(msg, kind = '') {
+    const s = $('#status');
+    s.textContent = msg;
+    s.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  // ---------- Input classification ----------
+  // Patterns are hints, not proof. Every plausible system is tried and every hit is shown.
+  function classify(raw, cat) {
+    const q = raw.trim();
+    const plan = { q, code: null, lookups: [], groups: [], filter: q };
+    if (!q) return plan;
+
+    const icd = /^[A-TV-Z]\d[0-9A-Z](\.?[0-9A-Z]{0,4})$/i;
+    const loinc = /^\d{1,5}-\d$/;
+    const numeric = /^\d{1,18}$/;
+
+    if (icd.test(q)) {
+      let code = q.toUpperCase().replace('.', '');
+      if (code.length > 3) code = code.slice(0, 3) + '.' + code.slice(3);
+      plan.code = code; plan.filter = code;
+      plan.lookups.push({ sys: SYSTEMS.icd10cm, code });
+      plan.groups = GROUPS.filter(g => g.key === 'conditions');
+    } else if (loinc.test(q)) {
+      plan.code = q;
+      plan.lookups.push({ sys: SYSTEMS.loinc, code: q });
+      // A hyphenated code as a text filter takes CARTOS about 13 seconds; validate-code against the lab list answers in a fraction of a second.
+      plan.vsCheck = { group: GROUPS.find(g => g.key === 'labs'), sys: SYSTEMS.loinc, code: q };
+      plan.groups = [];
+    } else if (numeric.test(q)) {
+      plan.code = q;
+      if (q.length <= 3) plan.lookups.push({ sys: SYSTEMS.cvx, code: q });
+      if (q.length <= 8) plan.lookups.push({ sys: SYSTEMS.rxnorm, code: q });
+      if (q.length >= 6) plan.lookups.push({ sys: SYSTEMS.sct, code: q });
+      // A bare number searched everywhere is noise; only the local vaccine list is cheap enough to always check.
+      plan.groups = q.length <= 3 ? GROUPS.filter(g => g.key === 'vaccines') : [];
+    } else {
+      plan.groups = GROUPS.slice();
+    }
+
+    if (cat !== 'all') {
+      const g = GROUPS.find(g => g.key === cat);
+      plan.lookups = plan.lookups.filter(l => g.systems.includes(l.sys.key));
+      if (plan.code && !plan.lookups.length && !g.local) {
+        // The pattern did not suggest this category, but the user asked for it: try its systems directly.
+        for (const k of g.systems) plan.lookups.push({ sys: SYSTEMS[k], code: plan.code });
+      }
+      plan.groups = [g];
+    }
+    return plan;
+  }
+
+  // ---------- Data access ----------
+  async function lookup(sys, code) {
+    const body = await fhir('CodeSystem/$lookup', { system: sys.url, code });
+    if (!body || body.resourceType !== 'Parameters') return null;
+    const p = {}, props = [];
+    for (const part of body.parameter || []) {
+      if (part.name === 'property') {
+        const kv = {};
+        for (const x of part.part || []) kv[x.name] = x.valueCode ?? x.valueString ?? x.valueBoolean ?? x.valueInteger ?? x.valueCoding?.display ?? x.valueCoding?.code;
+        if (kv.code !== undefined) props.push({ code: kv.code, value: kv.value });
+      } else if (part.name !== 'designation') {
+        p[part.name] = part.valueString ?? part.valueCode ?? part.valueUri ?? part.valueBoolean;
+      }
+    }
+    return { sys, code, display: p.display, version: p.version, props, raw: body };
+  }
+
+  async function validateInVs(vs, sys, code) {
+    const body = await fhir('ValueSet/$validate-code', { url: vs, system: sys.url, code });
+    if (!body || body.resourceType !== 'Parameters') return null;
+    const p = {};
+    for (const part of body.parameter || []) p[part.name] = part.valueBoolean ?? part.valueString ?? part.valueCode;
+    return p.result === true ? { sys, code, display: p.display, version: p.version, props: [], raw: body } : null;
+  }
+
+  function rank(items, q) {
+    const ql = q.toLowerCase();
+    const score = it => {
+      const d = (it.display || '').toLowerCase();
+      return (d === ql ? 0 : d.startsWith(ql) ? 1 : 2) * 10 + (it.inactive ? 5 : 0) + Math.min(d.length / 200, 1);
+    };
+    return items.slice().sort((a, b) => score(a) - score(b));
+  }
+
+  async function expand(vs, filter, offset = 0) {
+    const body = await fhir('ValueSet/$expand', { url: vs, filter, count: PAGE, offset });
+    if (!body || body.resourceType !== 'ValueSet') return { total: 0, items: [] };
+    const ex = body.expansion || {};
+    const items = (ex.contains || []).map(c => ({ system: c.system, code: c.code, display: c.display, inactive: !!c.inactive }));
+    return { total: ex.total ?? items.length, items: offset === 0 ? rank(items, filter) : items };
+  }
+
+  let cvxList = null;
+  async function getCvx() {
+    if (cvxList) return cvxList;
+    try {
+      const raw = localStorage.getItem(CVX_CACHE_KEY);
+      if (raw) { const { t, v } = JSON.parse(raw); if (Date.now() - t < CVX_TTL_MS && Array.isArray(v) && v.length) { cvxList = v; return v; } }
+    } catch {}
+    const body = await fhir('CodeSystem', { url: SYSTEMS.cvx.url, _count: 1 });
+    const cs = body?.entry?.[0]?.resource;
+    cvxList = (cs?.concept || []).map(c => ({ system: SYSTEMS.cvx.url, code: c.code, display: c.display, inactive: false, version: cs.version }));
+    try { localStorage.setItem(CVX_CACHE_KEY, JSON.stringify({ t: Date.now(), v: cvxList })); } catch {}
+    return cvxList;
+  }
+  function cvxSearch(list, q) {
+    const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+    return rank(list.filter(c => {
+      const words = (c.display || '').toLowerCase().split(/[^a-z0-9]+/);
+      return toks.every(t => c.code.toLowerCase() === t || words.some(w => w.startsWith(t)));
+    }), q);
+  }
+
+  // ---------- Rendering ----------
+  const out = $('#out');
+
+  function sysTag(systemUrl) {
+    const s = systemByUrl[systemUrl];
+    return el('span', { class: 'tag', title: systemUrl }, s ? s.name : (systemUrl || '').replace(/^https?:\/\//, ''));
+  }
+
+  function copyButton(text) {
+    const b = el('button', { class: 'copy', type: 'button', title: 'Copy code and label' }, 'Copy');
+    b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+      catch { b.textContent = 'Select and copy manually'; }
+      setTimeout(() => (b.textContent = 'Copy'), 1500);
+    });
+    return b;
+  }
+
+  // Internal flags that mean nothing to a member of the public. They stay visible in the raw FHIR.
+  const HIDDEN_PROPS = new Set(['display', 'parent', 'child', 'OrderNumber', 'NonVaccine', 'Suppress', 'RXN_PRESCRIBABLE', 'TTY']);
+  function renderExact(hit, note) {
+    const card = el('div', { class: 'card exact' });
+    const label = hit.display || '(no label returned)';
+    card.append(el('div', { class: 'top' }, el('p', { class: 'display' }, label), copyButton(`${hit.code} — ${label} (${hit.sys.name}${hit.version ? ' ' + hit.version : ''})`)));
+    const meta = el('div', { class: 'meta' }, el('span', {}, el('span', { class: 'code' }, hit.code)), sysTag(hit.sys.url));
+    if (hit.version) meta.append(el('span', {}, 'version ' + hit.version));
+    card.append(meta, el('p', { class: 'note' }, hit.sys.about));
+    if (note) card.append(el('p', { class: 'note' }, note));
+
+    const shown = (hit.props || []).filter(p => !HIDDEN_PROPS.has(p.code) && p.value !== undefined && p.value !== null && p.value !== '');
+    if (shown.length) {
+      const dl = el('dl', { class: 'props' });
+      for (const p of shown) {
+        let k = p.code, v = String(p.value);
+        if (p.code === 'inactive') { k = 'In use'; v = (p.value === true || p.value === 'true') ? 'No. Retired, but still resolvable for old records.' : 'Yes'; }
+        if (p.code === 'Status') { k = 'Status (per the source)'; }
+        if (p.code === 'Billable') { k = 'Billable'; v = v === '1' ? 'Yes. Specific enough to appear on a claim.' : 'No. This is a category heading; claims need a more specific code beneath it.'; }
+        dl.append(el('dt', {}, k), el('dd', {}, v));
+      }
+      card.append(dl);
+    }
+    if (hit.raw) card.append(el('details', {}, el('summary', {}, 'Show the raw FHIR response'), el('pre', {}, JSON.stringify(hit.raw, null, 2))));
+    return card;
+  }
+
+  function renderRow(item) {
+    const li = el('li');
+    const btn = el('button', { class: 'row', type: 'button', title: 'Decode this code', onclick: () => runQuery(item.code, { system: item.system }) },
+      el('span', { class: 'code' }, item.code),
+      el('span', { class: 'disp' }, item.display || ''),
+      el('span', {}, sysTag(item.system), item.inactive ? el('span', { class: 'tag inactive' }, ' inactive') : null));
+    li.append(btn);
+    return li;
+  }
+
+  function groupShell(group) {
+    const sec = el('section', { class: 'group' });
+    const count = el('span', { class: 'count' }, 'searching…');
+    sec.append(el('h2', {}, group.title, count), el('p', { class: 'about' }, group.about));
+    const body = el('div');
+    sec.append(body);
+    return { sec, count, body };
+  }
+
+  function fillGroup(shell, group, result, loadMore) {
+    shell.count.textContent = result.total ? `${result.total.toLocaleString()} match${result.total === 1 ? '' : 'es'}` : 'no matches';
+    shell.body.replaceChildren();
+    if (!result.items.length) { shell.sec.classList.add('hidden'); return false; }
+    const ul = el('ul', { class: 'results' });
+    result.items.forEach(it => ul.append(renderRow(it)));
+    shell.body.append(ul);
+    if (result.total > result.items.length) {
+      shell.body.append(el('p', { class: 'note' }, `Showing ${result.items.length} of ${result.total.toLocaleString()}. The first page is sorted so names that begin with your word come first; the rest are in the order CARTOS returned them, not by relevance.`));
+    }
+    if (loadMore && result.items.length < result.total) {
+      const more = el('div', { class: 'more' });
+      const b = el('button', { type: 'button' }, `Show ${Math.min(PAGE, result.total - result.items.length)} more`);
+      b.addEventListener('click', async () => {
+        b.disabled = true; b.textContent = 'Loading…';
+        try {
+          const next = await loadMore(result.items.length);
+          next.items.forEach(it => ul.append(renderRow(it)));
+          result.items.push(...next.items);
+          if (result.items.length >= result.total || !next.items.length) more.remove();
+          else { b.disabled = false; b.textContent = `Show ${Math.min(PAGE, result.total - result.items.length)} more`; }
+        } catch (e) { setStatus(e.message, e instanceof RateLimited ? 'warn' : 'err'); b.disabled = false; b.textContent = 'Try again'; }
+      });
+      more.append(b);
+      shell.body.append(more);
+    }
+    return true;
+  }
+
+  // ---------- Orchestration ----------
+  let seq = 0;
+  let cat = 'all';
+
+  function syncHash(q) {
+    const h = q ? '#q=' + encodeURIComponent(q) + (cat !== 'all' ? '&in=' + cat : '') : '';
+    history.replaceState(null, '', location.pathname + h);
+  }
+
+  async function runQuery(raw, opts = {}) {
+    const my = ++seq;
+    const plan = classify(raw, cat);
+    out.replaceChildren();
+    syncHash(plan.q);
+    if (!plan.q) { setStatus(''); return; }
+    $('#q').value = plan.q;
+
+    // A click on a result row already knows its system: decode just that.
+    if (opts.system && systemByUrl[opts.system]) {
+      plan.lookups = [{ sys: systemByUrl[opts.system], code: plan.q }];
+      plan.groups = [];
+      plan.code = plan.q;
+    }
+
+    setStatus('Looking up…');
+    const exactSec = el('section', { class: 'group hidden' }, el('h2', {}, plan.lookups.length > 1 ? 'Exact matches' : 'Exact match'));
+    out.append(exactSec);
+    const shells = new Map();
+    for (const g of plan.groups) { const s = groupShell(g); shells.set(g.key, s); out.append(s.sec); }
+
+    let exactHits = 0;
+    const exactSystems = new Set();
+    const addExact = (hit, note) => {
+      exactHits++;
+      exactSystems.add(hit.sys.url);
+      exactSec.append(renderExact(hit, note));
+      exactSec.classList.remove('hidden');
+      if (exactSystems.size > 1) exactSec.querySelector('h2').textContent = 'Exact matches: this number exists in more than one vocabulary';
+    };
+
+    const lookupTasks = plan.lookups.map(l => lookup(l.sys, l.code).then(hit => {
+      if (my !== seq || !hit) return;
+      addExact(hit);
+    }));
+    // Group results that might promote an exact card wait for the live lookups, so a fast local answer never duplicates a slow live one.
+    const lookupsDone = Promise.allSettled(lookupTasks);
+
+    const checkTasks = [];
+    if (plan.vsCheck && !opts.system) {
+      const { group, sys, code } = plan.vsCheck;
+      checkTasks.push(validateInVs(group.vs, sys, code).then(async hit => {
+        if (my !== seq || !hit) return;
+        await lookupsDone;
+        if (my !== seq || exactSystems.has(sys.url)) return;
+        addExact(hit, `Confirmed against the ${group.title.toLowerCase()} list. A direct lookup of this code did not answer, which happens for some LOINC codes on CARTOS.`);
+      }));
+    }
+
+    const groupHadItems = {};
+    const groupTasks = plan.groups.map(g => {
+      const shell = shells.get(g.key);
+      const p = g.local
+        ? getCvx().then(list => { const items = cvxSearch(list, plan.filter); return { total: items.length, items: items.slice(0, 50) }; })
+        : expand(g.vs, plan.filter);
+      return p.then(async res => {
+        if (my !== seq) return;
+        if (plan.code) {
+          await lookupsDone;
+          if (my !== seq) return;
+          // Decoding a code: if the direct lookup failed but the list has that exact code, promote it to an exact card.
+          const exact = res.items.find(it => it.code.toUpperCase() === plan.code.toUpperCase());
+          if (exact && !exactSystems.has(exact.system)) {
+            const sys = systemByUrl[exact.system] || { url: exact.system, name: exact.system, about: '' };
+            const why = sys === SYSTEMS.loinc ? ' That happens for some LOINC codes on CARTOS.' : '';
+            addExact({ sys, code: exact.code, display: exact.display, version: exact.version, props: exact.inactive ? [{ code: 'inactive', value: true }] : [] },
+              `Found in the ${g.title.toLowerCase()} list. A direct lookup of this code did not answer.${why}`);
+          }
+          // Hide the list when it only repeats the exact card.
+          if (res.items.length === 1 && exact) { shell.sec.classList.add('hidden'); groupHadItems[g.key] = false; return; }
+        }
+        groupHadItems[g.key] = fillGroup(shell, g, res, g.local ? null : (offset => expand(g.vs, plan.filter, offset)));
+      }, err => {
+        if (my !== seq) return;
+        shell.count.textContent = 'could not search';
+        shell.body.replaceChildren(el('div', { class: 'empty' }, err.message));
+        groupHadItems[g.key] = false;
+        throw err;
+      });
+    });
+
+    const slowHint = setTimeout(() => {
+      if (my !== seq) return;
+      for (const s of shells.values()) if (s.count.textContent === 'searching…') s.count.textContent = 'still searching, CARTOS is slow on this one…';
+    }, 6000);
+    const settled = await Promise.allSettled([...lookupTasks, ...checkTasks, ...groupTasks]);
+    clearTimeout(slowHint);
+    const tasks = settled;
+    if (my !== seq) return;
+    if (exactHits === 1) exactSec.querySelector('h2').textContent = 'Exact match';
+
+    const emptyGroups = plan.groups.filter(g => groupHadItems[g.key] === false).map(g => g.title.toLowerCase());
+    if (emptyGroups.length && emptyGroups.length < plan.groups.length) {
+      out.append(el('p', { class: 'none' }, `No matches in ${emptyGroups.join(', ')}.`));
+    }
+
+    const errors = settled.filter(s => s.status === 'rejected').map(s => s.reason);
+    const rl = errors.find(e => e instanceof RateLimited);
+    const anything = exactHits > 0 || Object.values(groupHadItems).some(Boolean);
+    if (rl) setStatus(rl.message, 'warn');
+    else if (errors.length && errors.length === tasks.length) setStatus(errors[0].message, 'err');
+    else if (errors.length) setStatus('Some sources did not answer: ' + errors[0].message, 'warn');
+    else if (!anything) {
+      setStatus(plan.code
+        ? `CARTOS did not return a match for "${plan.q}"${cat !== 'all' ? ' in ' + CATS.find(c => c.key === cat).label.toLowerCase() : ''}. That is inconclusive rather than proof the code is wrong: it may be in a code set CARTOS does not carry (CPT, HCPCS, NDC, a local lab code), or a vocabulary this page does not try. Check for typos or choose a different category above.`
+        : `No matches for "${plan.q}". Try a shorter or more general word, or a different category above.`, 'warn');
+    } else setStatus('');
+  }
+
+  // ---------- Wiring ----------
+  const input = $('#q');
+  let timer = null;
+  const clear = () => { seq++; out.replaceChildren(); setStatus(''); syncHash(''); };
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const v = input.value.trim();
+    if (v.length < 2) { clear(); return; }
+    timer = setTimeout(() => runQuery(v), 400);
+  });
+  $('#form').addEventListener('submit', e => { e.preventDefault(); clearTimeout(timer); runQuery(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; clear(); } });
+
+  const catsRow = $('#cats');
+  const catButtons = new Map();
+  for (const c of CATS) {
+    const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(c.key === cat), onclick: () => setCat(c.key) }, c.label);
+    catButtons.set(c.key, b);
+    catsRow.append(b);
+  }
+  function setCat(key) {
+    cat = key;
+    for (const [k, b] of catButtons) b.setAttribute('aria-pressed', String(k === key));
+    if (input.value.trim().length >= 2) runQuery(input.value);
+    else syncHash('');
+  }
+
+  const ex = $('#examples');
+  for (const x of EXAMPLES) ex.append(el('button', { class: 'chip', type: 'button', onclick: () => { input.value = x; runQuery(x); } }, x));
+
+  renderStats();
+  const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const q0 = params.get('q'), in0 = params.get('in');
+  if (in0 && CATS.some(c => c.key === in0)) { cat = in0; for (const [k, b] of catButtons) b.setAttribute('aria-pressed', String(k === cat)); }
+  if (q0) { input.value = q0; runQuery(q0); }
+})();
+</script>
+</body>
+</html>
