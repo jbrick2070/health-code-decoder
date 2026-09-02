@@ -3,8 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Health Code Decoder</title>
-<meta name="description" content="Type a word and see how it appears across the vocabularies inside US health records, or paste a code from a medical bill, lab report, or shot record and see what it means. Powered by ONC CARTOS.">
+<title>Health Code Decoder · built on ONC CARTOS</title>
+<meta name="description" content="Type a word and see how it appears across the vocabularies inside US health records, or paste a code from a medical bill, lab report, or shot record and see what it means. Built on CARTOS, ONC's free public terminology service.">
+<link rel="canonical" href="https://jbrick2070.github.io/health-code-decoder/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Health Code Decoder">
+<meta property="og:title" content="Health Code Decoder · built on ONC CARTOS">
+<meta property="og:description" content="Type a word or paste a code from a medical bill, lab report, or shot record, and see what it means across SNOMED CT, LOINC, RxNorm, ICD-10-CM, and CVX. Live data from CARTOS, ONC's free public terminology service.">
+<meta property="og:url" content="https://jbrick2070.github.io/health-code-decoder/">
+<meta property="og:image" content="https://jbrick2070.github.io/health-code-decoder/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Health Code Decoder, built on ONC CARTOS. Pills for SNOMED CT, LOINC, RxNorm, ICD-10-CM, and CVX.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Health Code Decoder · built on ONC CARTOS">
+<meta name="twitter:description" content="Type a word or paste a health code and see what it means across US health vocabularies. Live data from ONC CARTOS.">
+<meta name="twitter:image" content="https://jbrick2070.github.io/health-code-decoder/social-card.png">
 <style>
   :root {
     color-scheme: light dark;
@@ -42,8 +56,13 @@
   body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.45; }
   a { color: var(--accent); }
   .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
+  header p.kicker { margin: 0 0 6px; font-size: 0.85rem; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
+  header p.kicker a { font-weight: 700; color: var(--accent); text-decoration: none; border-bottom: 2px solid var(--accent); }
   header h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
-  header p.lede { margin: 0 0 18px; color: var(--muted); }
+  header p.lede { margin: 0 0 10px; color: var(--muted); }
+  details.about-cartos { margin: 0 0 18px; }
+  details.about-cartos summary { color: var(--accent); font-size: 0.9rem; cursor: pointer; }
+  details.about-cartos p { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
 
   .searchbar { display: flex; gap: 8px; }
   .searchbar input {
@@ -115,8 +134,14 @@
 <body>
 <div class="wrap">
   <header>
+    <p class="kicker">Built on <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a> · ONC's free public terminology service</p>
     <h1>Health Code Decoder</h1>
     <p class="lede">Type a word like <em>asthma</em> and see how it shows up across the vocabularies inside US health records. Or paste a code from a medical bill, lab report, or shot record and see what it stands for.</p>
+    <details class="about-cartos">
+      <summary>What is CARTOS, and why does this page exist?</summary>
+      <p>CARTOS is ONC's terminology service. It gathers the code systems and value sets that certified US health IT has to use, such as SNOMED CT, LOINC, RxNorm, ICD-10-CM, and the CDC's CVX vaccine codes, into one place, with a <a href="https://cartos.healthit.gov/TerminologyBrowser/vpc/termsearch" target="_blank" rel="noopener">terminology browser</a> and a standards-based <a href="https://cartos.healthit.gov/TerminologyServer/Swagger/index.html" target="_blank" rel="noopener">FHIR API</a>. It is free and needs no account.</p>
+      <p>This page is a small hobby demo of what anyone can build on it: every answer you see is fetched live from CARTOS, straight from your browser, with no server in between.</p>
+    </details>
   </header>
 
   <form class="searchbar" id="form" autocomplete="off">
