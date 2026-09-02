@@ -25,9 +25,10 @@ then visit http://localhost:8765/.
 - **Searches words.** Runs the query through four US Core value sets on CARTOS (conditions and
   diagnoses, medications, lab tests, procedures) plus a locally cached list of CVX vaccines, and
   shows the groups in a fixed order with totals and "Show more" paging.
-- **Decodes codes.** Recognizes ICD-10-CM (`E11.9`, `J45`), LOINC (`2345-7`), and bare numbers.
-  A bare number is tried as a CVX vaccine code, an RxNorm drug code, and a SNOMED CT concept, and
-  every hit is shown, because the pattern alone cannot tell which vocabulary it belongs to.
+- **Decodes codes.** Recognizes ICD-10-CM (`E11.9`, `J45`, `U07.1`), LOINC (`2345-7`), and bare
+  numbers. A bare number is tried as a CVX vaccine code (up to 3 digits), an RxNorm drug code (up
+  to 8 digits), and a SNOMED CT concept (6 to 18 digits), and every hit is shown, because the
+  pattern alone cannot tell which vocabulary it belongs to. A category chip overrides the guess.
 - **Narrows by category.** Chips for conditions, medications, lab tests, procedures, and vaccines
   both filter word searches and resolve ambiguous numbers.
 - **Explains the vocabulary.** Each hit says which code set it belongs to and what that code set is

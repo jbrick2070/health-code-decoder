@@ -107,4 +107,38 @@ CUT: counter and pulse REJECTED (see Codex). "B12" chip: ACCEPTED.
 
 `claude -p` cannot run inside a Claude Code session, so per the user's instruction the Sonnet
 opinion came from an in-session Sonnet subagent reading a frozen snapshot of the same files. Its
-review is saved as claude.md; grounding notes are appended below when it lands.
+review is saved as claude.md. VERDICT "yes-with-fixes".
+
+MUST-FIX
+1. LOINC row click shows a false "not found". CONFIRMED (anchor M1), fixed.
+2. Category chip turns a LOINC code into a hyphenated $expand. CONFIRMED (Cursor M2), fixed. The
+   extra point that a category also fires $expand for ICD-shaped and long-numeric codes: CONFIRMED
+   but REJECTED as a defect. Those filters are not hyphenated, answer fast, and act as a fallback
+   that finds the code in the list when the direct lookup misses; the list is hidden when it only
+   repeats the exact card.
+3. Escape does not cancel the pending debounce. CONFIRMED (Codex M5), fixed.
+4. Light-theme contrast: LOINC, RxNorm, and CVX colors fail 4.5:1 as white-on-fill and as text on
+   the 14% tint. CONFIRMED and the only finding unique to this lane. Measured with a WCAG
+   luminance script: the old values scored 3.3-3.8 on white and 2.8-3.2 on tint; ICD-10-CM blue
+   also fell to 4.24 on tint, which Sonnet did not catch. Fixed: all six light-theme vocabulary
+   colors darkened (now 5.4-7.6 on white, 5.4-6.1 on tint). Dark theme was already passing.
+5. Invisible row focus. CONFIRMED (anchor M4), fixed.
+6. Notices collapsed. Fixed as visible paragraphs (see Cursor S1).
+
+SHOULD-FIX
+1. getCvx() issues duplicate requests when called concurrently. CONFIRMED and generalizable: any
+   identical URL requested twice before the first completes was fetched twice. Fixed: fhir() now
+   coalesces identical in-flight URLs, which covers CVX and every other request.
+2. CVX 50-item cap without paging. CONFIRMED (Codex S5), fixed.
+3. ICD regex excludes U. CONFIRMED, fixed.
+4. README overstates bare-number decoding (code gates by length). CONFIRMED. Fixed: README now
+   states the length ranges.
+5. #examples lacks role="group" and a label. CONFIRMED, fixed.
+6. Copy confirmation not announced. CONFIRMED, already fixed in the rewrite (setStatus on copy).
+
+CUT
+- og:image tags because social-card.png "is not present in this snapshot". MISREAD in context: the
+  snapshot given to the reviewer held text files only; the PNG is in the repo and returned HTTP 200
+  from the live site earlier today. Kept.
+- Nothing else; Sonnet explicitly declined to cut the counter, the about disclosure, or raw FHIR,
+  agreeing with the driver against Codex and Cursor on the counter and pulse.
