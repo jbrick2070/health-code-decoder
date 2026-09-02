@@ -22,146 +22,237 @@
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #f6f7f9;
+    --bg: #f4f6fa;
+    --bg-glow-a: #dbeafe;
+    --bg-glow-b: #ccfbf1;
     --panel: #ffffff;
-    --ink: #1c2330;
-    --muted: #5d6673;
-    --line: #dfe3e8;
+    --panel-2: #f8fafc;
+    --ink: #0f172a;
+    --muted: #55637a;
+    --line: #dde3ec;
     --accent: #0b5fa5;
+    --accent-2: #0f9d8a;
     --accent-ink: #ffffff;
     --chip: #eef2f7;
-    --ok: #1a7f4b;
-    --warn: #a15c00;
-    --err: #b3261e;
+    --ok: #15803d;
+    --warn: #b45309;
+    --err: #b91c1c;
+    --shadow: 0 1px 2px rgba(15,23,42,.05), 0 8px 24px -12px rgba(15,23,42,.18);
+    --sys-icd10cm: #2563eb;
+    --sys-sct: #7c3aed;
+    --sys-loinc: #0d9488;
+    --sys-rxnorm: #16a34a;
+    --sys-cvx: #ea580c;
+    --sys-other: #64748b;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #121519;
-      --panel: #1b2027;
-      --ink: #e7eaee;
-      --muted: #9aa4b1;
-      --line: #2c343e;
-      --accent: #6db3f2;
-      --accent-ink: #0b1420;
-      --chip: #242b34;
-      --ok: #5fcf8a;
-      --warn: #f0b35a;
-      --err: #ff8a80;
+      --bg: #0d1117;
+      --bg-glow-a: #12305a;
+      --bg-glow-b: #0f3d3a;
+      --panel: #161c25;
+      --panel-2: #1b222d;
+      --ink: #e6ebf2;
+      --muted: #94a3b8;
+      --line: #273040;
+      --accent: #78b8f5;
+      --accent-2: #4fd1bd;
+      --accent-ink: #061120;
+      --chip: #212a36;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+      --sys-icd10cm: #7fb0ff;
+      --sys-sct: #b79bff;
+      --sys-loinc: #5fd3c6;
+      --sys-rxnorm: #6ee7a0;
+      --sys-cvx: #fb9a5c;
+      --sys-other: #94a3b8;
     }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.45; }
+  body {
+    color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    background:
+      radial-gradient(1100px 520px at -10% -20%, var(--bg-glow-a) 0%, transparent 60%),
+      radial-gradient(900px 480px at 110% -10%, var(--bg-glow-b) 0%, transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+  }
   a { color: var(--accent); }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
-  header p.kicker { margin: 0 0 6px; font-size: 0.85rem; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
-  header p.kicker a { font-weight: 700; color: var(--accent); text-decoration: none; border-bottom: 2px solid var(--accent); }
-  header h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: -0.01em; }
-  header p.lede { margin: 0 0 10px; color: var(--muted); }
-  details.about-cartos { margin: 0 0 18px; }
-  details.about-cartos summary { color: var(--accent); font-size: 0.9rem; cursor: pointer; }
-  details.about-cartos p { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 28px 18px 56px; }
 
-  .searchbar { display: flex; gap: 8px; }
-  .searchbar input {
-    flex: 1; font: inherit; font-size: 1.15rem; padding: 12px 14px; min-width: 0;
-    border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); outline: none;
+  /* ---------- Hero ---------- */
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 9px; border-radius: 999px;
+    background: color-mix(in srgb, var(--panel) 75%, transparent); border: 1px solid var(--line);
+    font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted);
+    backdrop-filter: blur(6px);
   }
-  .searchbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
-  .searchbar button {
-    font: inherit; font-weight: 600; padding: 12px 18px; border-radius: 10px; border: 0;
-    background: var(--accent); color: var(--accent-ink); cursor: pointer;
+  .badge a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .badge .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 0 0 transparent; transition: background .3s; }
+  .badge .dot.live { background: var(--ok); animation: pulse 1.8s ease-out infinite; }
+  .badge .dot.warn { background: var(--warn); }
+  .badge .dot.err { background: var(--err); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
+  h1 {
+    margin: 14px 0 6px; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; letter-spacing: -0.03em;
+    background: linear-gradient(92deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .row-chips { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+  p.lede { margin: 0 0 12px; color: var(--muted); font-size: 1.05rem; max-width: 62ch; }
+  details.about { margin: 0 0 20px; }
+  details.about summary { color: var(--accent); font-size: 0.92rem; cursor: pointer; }
+  details.about p { margin: 8px 0 0; color: var(--muted); font-size: 0.92rem; max-width: 72ch; }
+
+  /* ---------- Search ---------- */
+  .search {
+    display: flex; gap: 8px; padding: 6px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow);
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent), var(--shadow); }
+  .search .icon { flex: none; width: 22px; height: 22px; margin: 13px 0 0 10px; color: var(--muted); }
+  .search input {
+    flex: 1; min-width: 0; font: inherit; font-size: 1.2rem; padding: 12px 8px; border: 0; background: transparent; color: var(--ink); outline: none;
+  }
+  .search input::placeholder { color: color-mix(in srgb, var(--muted) 75%, transparent); }
+  .search button {
+    flex: none; font: inherit; font-weight: 700; padding: 0 20px; border-radius: 11px; border: 0; cursor: pointer;
+    background: linear-gradient(92deg, var(--accent), var(--accent-2)); color: var(--accent-ink);
+  }
+  .search button:hover { filter: brightness(1.06); }
+  .row-chips { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+  .row-chips .lbl { margin-right: 2px; }
   .chip {
-    font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
-    background: var(--chip); color: var(--ink); cursor: pointer;
+    font: inherit; font-size: 0.86rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--panel) 80%, transparent); color: var(--ink); cursor: pointer; transition: transform .12s, border-color .12s, background .12s;
   }
-  .chip:hover { border-color: var(--accent); }
-  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-  .status { margin: 12px 0 0; min-height: 1.4em; color: var(--muted); font-size: 0.9rem; }
+  .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .chip[aria-pressed="true"] { background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: #fff; font-weight: 600; }
+  .chip.ex { font-family: var(--mono); font-size: 0.82rem; }
+  .status { margin: 12px 0 0; min-height: 1.5em; color: var(--muted); font-size: 0.92rem; }
   .status.err { color: var(--err); }
   .status.warn { color: var(--warn); }
 
-  section.group { margin-top: 22px; }
-  section.group h2 { font-size: 1.05rem; margin: 0 0 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  section.group h2 .count { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
-  section.group p.about { margin: 0 0 8px; color: var(--muted); font-size: 0.9rem; }
-  p.note { margin: 6px 0 0; color: var(--muted); font-size: 0.85rem; }
+  /* ---------- Results ---------- */
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  section.group { margin-top: 26px; animation: rise .28s ease-out both; }
+  section.group h2 { font-size: 1.08rem; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  section.group h2 .swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--cat, var(--accent)); flex: none; }
+  section.group h2 .count { color: var(--muted); font-weight: 500; font-size: 0.82rem; padding: 2px 9px; border-radius: 999px; background: var(--chip); }
+  section.group p.about { margin: 0 0 10px; color: var(--muted); font-size: 0.9rem; }
+  p.note { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; }
 
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-  .card.exact { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
-  .card + .card { margin-top: 10px; }
-  .card .top { display: flex; align-items: flex-start; gap: 10px; }
-  .card .display { font-size: 1.25rem; font-weight: 600; margin: 0 0 6px; flex: 1; }
+  .card {
+    position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 16px 22px; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--sys, var(--accent)); }
+  .card + .card { margin-top: 12px; }
+  .card .top { display: flex; align-items: flex-start; gap: 12px; }
+  .card .display { font-size: 1.35rem; font-weight: 700; margin: 0 0 8px; flex: 1; letter-spacing: -0.01em; line-height: 1.25; }
   .card .meta { color: var(--muted); font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
-  .copy { font: inherit; font-size: 0.8rem; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; white-space: nowrap; }
-  .code { font-family: var(--mono); font-size: 0.95em; background: var(--chip); padding: 1px 6px; border-radius: 6px; }
-  .tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
-  .tag.inactive { color: var(--warn); }
-  dl.props { margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 0.9rem; }
+  .copy { font: inherit; font-size: 0.8rem; padding: 5px 11px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .copy:hover { border-color: var(--accent); }
+  .code { font-family: var(--mono); font-size: 0.92em; padding: 2px 7px; border-radius: 7px; background: color-mix(in srgb, var(--sys, var(--accent)) 14%, transparent); color: var(--sys, var(--accent)); font-weight: 600; }
+  .tag { font-size: 0.74rem; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--sys, var(--sys-other)) 14%, transparent); color: var(--sys, var(--sys-other)); white-space: nowrap; font-weight: 600; letter-spacing: 0.01em; }
+  .tag.inactive { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+  dl.props { margin: 12px 0 0; padding: 12px 0 0; border-top: 1px dashed var(--line); display: grid; grid-template-columns: max-content 1fr; gap: 5px 14px; font-size: 0.9rem; }
   dl.props dt { color: var(--muted); }
   dl.props dd { margin: 0; }
-  details { margin-top: 10px; }
-  details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
-  pre { margin: 8px 0 0; padding: 10px; background: var(--chip); border-radius: 8px; overflow-x: auto; font-size: 0.8rem; max-height: 320px; }
+  details.raw { margin-top: 10px; }
+  details.raw summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
+  pre { margin: 8px 0 0; padding: 10px; background: var(--chip); border-radius: 8px; overflow-x: auto; font-size: 0.78rem; max-height: 320px; }
 
-  ul.results { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  ul.results { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
   ul.results li { border-top: 1px solid var(--line); }
   ul.results li:first-child { border-top: 0; }
   ul.results li button.row {
-    all: unset; cursor: pointer; width: 100%; display: grid; grid-template-columns: minmax(90px, max-content) 1fr auto;
-    gap: 10px; align-items: center; padding: 9px 14px; box-sizing: border-box;
+    all: unset; cursor: pointer; width: 100%; display: grid; grid-template-columns: minmax(96px, max-content) 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; box-sizing: border-box; transition: background .12s;
   }
-  ul.results li button.row:hover, ul.results li button.row:focus-visible { background: color-mix(in srgb, var(--accent) 8%, var(--panel)); }
+  ul.results li button.row:hover, ul.results li button.row:focus-visible { background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
   ul.results .disp { overflow-wrap: anywhere; }
-  .more { margin-top: 8px; }
-  .more button { font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .more { margin-top: 10px; }
+  .more button { font: inherit; font-size: 0.9rem; padding: 7px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .more button:hover { border-color: var(--accent); }
   .empty { color: var(--muted); font-size: 0.95rem; padding: 6px 2px; }
   .none { margin-top: 22px; color: var(--muted); font-size: 0.9rem; }
 
-  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; }
-  footer p { margin: 6px 0; }
+  /* ---------- Footer / legal ---------- */
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.82rem; }
+  footer h2 { font-size: 0.95rem; color: var(--ink); margin: 18px 0 6px; }
+  footer p { margin: 6px 0; max-width: 80ch; }
+  footer details { margin: 8px 0; }
+  footer details summary { cursor: pointer; color: var(--accent); }
+  footer blockquote { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--line); background: color-mix(in srgb, var(--panel) 70%, transparent); border-radius: 0 8px 8px 0; }
   .hidden { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { section.group { animation: none; } .badge .dot.live { animation: none; } .chip:hover { transform: none; } }
   @media (max-width: 560px) {
-    ul.results li button.row { grid-template-columns: 1fr; gap: 2px; }
-    .searchbar button { padding: 12px 14px; }
+    ul.results li button.row { grid-template-columns: 1fr; gap: 3px; }
+    .search { flex-wrap: wrap; }
+    .search button { width: 100%; padding: 12px; }
+    .search .icon { display: none; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="kicker">Built on <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a> · ONC's free public terminology service</p>
+    <span class="badge"><span class="dot" id="livedot" aria-hidden="true"></span><span id="livetext">Live data from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a> · ONC's public terminology service</span></span>
     <h1>Health Code Decoder</h1>
     <p class="lede">Type a word like <em>asthma</em> and see how it shows up across the vocabularies inside US health records. Or paste a code from a medical bill, lab report, or shot record and see what it stands for.</p>
-    <details class="about-cartos">
+    <details class="about">
       <summary>What is CARTOS, and why does this page exist?</summary>
-      <p>CARTOS is ONC's terminology service. It gathers the code systems and value sets that certified US health IT has to use, such as SNOMED CT, LOINC, RxNorm, ICD-10-CM, and the CDC's CVX vaccine codes, into one place, with a <a href="https://cartos.healthit.gov/TerminologyBrowser/vpc/termsearch" target="_blank" rel="noopener">terminology browser</a> and a standards-based <a href="https://cartos.healthit.gov/TerminologyServer/Swagger/index.html" target="_blank" rel="noopener">FHIR API</a>. It is free and needs no account.</p>
-      <p>This page is a small hobby demo of what anyone can build on it: every answer you see is fetched live from CARTOS, straight from your browser, with no server in between.</p>
+      <p>CARTOS is the terminology service run by the US Office of the National Coordinator for Health IT (ONC). It gathers the code systems and value sets that certified US health IT has to use, such as SNOMED CT, LOINC, RxNorm, ICD-10-CM, and the CDC's CVX vaccine codes, into one place, with a <a href="https://cartos.healthit.gov/TerminologyBrowser/vpc/termsearch" target="_blank" rel="noopener">terminology browser</a> and a standards-based <a href="https://cartos.healthit.gov/TerminologyServer/Swagger/index.html" target="_blank" rel="noopener">FHIR API</a>. It is free and needs no account.</p>
+      <p>This page is a small independent hobby demo of what anyone can build on it: every answer you see is fetched live from CARTOS, straight from your browser, with no server in between. It exists to help curious people learn how health data is coded. It is not a clinical tool.</p>
     </details>
   </header>
 
-  <form class="searchbar" id="form" autocomplete="off">
+  <form class="search" id="form" autocomplete="off" role="search">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="A word like diabetes, metformin, glucose — or a code like E11.9, 208, 73211009" aria-label="Word or code to look up" autofocus>
     <button type="submit">Look up</button>
   </form>
-  <div class="row-chips" id="cats" role="group" aria-label="Narrow results to one kind of record">Narrow to:</div>
-  <div class="row-chips" id="examples">Try:</div>
+  <div class="row-chips" id="cats" role="group" aria-label="Narrow results to one kind of record"><span class="lbl">Narrow to:</span></div>
+  <div class="row-chips" id="examples"><span class="lbl">Try:</span></div>
   <div class="status" id="status" aria-live="polite"></div>
 
   <main id="out"></main>
 
   <footer>
-    <p><strong>Where this comes from.</strong> Every result is fetched live from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a>, the free public terminology service run by the US Office of the National Coordinator for Health IT. Nothing you type is stored anywhere except your own browser for this visit.</p>
-    <p><strong>This is a terminology lookup, not medical interpretation.</strong> A code's official label is the name a computer system uses for it. It is not a diagnosis, a recommendation, or an explanation of your care. Ask your clinician about anything on your records.</p>
-    <p><strong>What it covers.</strong> Searches go through the US Core value sets for conditions, medications, lab tests, and procedures, plus the CDC vaccine list. A code that is missing here may still be valid; it may simply be outside those lists or in a code set CARTOS does not carry, such as CPT, HCPCS, or NDC.</p>
-    <p><strong>Attributions.</strong> SNOMED CT is © SNOMED International; the US Edition is distributed by the National Library of Medicine. LOINC is © Regenstrief Institute, Inc. RxNorm is produced by the National Library of Medicine. ICD-10-CM is maintained by the CDC National Center for Health Statistics. CVX is maintained by the CDC. Each is used here under its steward's terms.</p>
-    <p><strong>Be gentle.</strong> CARTOS is a shared service with a limit of about 2,000 requests per 5 minutes per address. This page waits between keystrokes, reuses answers it already has, and pauses when told to slow down.</p>
+    <h2>About this page</h2>
+    <p><strong>Where the answers come from.</strong> Every result is fetched live from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a>, the public FHIR terminology service run by ONC, part of the US Department of Health and Human Services. When you search, your query is sent from your browser directly to cartos.healthit.gov, where <a href="https://healthit.gov/healthit-gov-privacy-policy-notice/" target="_blank" rel="noopener">HealthIT.gov's privacy policy</a> applies. This page has no server of its own, sets no cookies, runs no analytics, and stores nothing except a copy of the small vaccine list in your browser.</p>
+    <p><strong>An educational demo, not a clinical or production tool.</strong> CARTOS is intended for terminology discovery, learning, testing, and research, and this page uses it that way: one interactive lookup at a time, at the pace a person types, within CARTOS's published rate limits. Do not use this page, or the CARTOS API behind it, inside a production clinical system or for patient care decisions. Organizations that need terminology at runtime should run their own terminology service.</p>
+    <p><strong>Not medical advice.</strong> A code's official label is the name a computer system uses for it. It is not a diagnosis, a treatment recommendation, or an explanation of your care, and terms shown here may be out of date or incomplete. Talk to your clinician about anything on your records.</p>
+    <p><strong>No affiliation or endorsement.</strong> This is an independent hobby project. It is not affiliated with, endorsed by, or supported by ONC, HHS, the National Library of Medicine, the CDC, SNOMED International, Regenstrief Institute, or HL7 International. Reference to those organizations and their vocabularies is for attribution only.</p>
+    <p><strong>What it covers, and what it can't.</strong> Word searches go through the HL7 US Core value sets for conditions, medications, lab tests, and procedures, plus the CDC CVX list. A code that is missing here may still be valid; it may sit outside those lists or belong to a code set CARTOS does not carry, such as CPT, HCPCS, or NDC. A code is never "wrong" just because this page cannot find it.</p>
+    <p><strong>Be gentle with a shared service.</strong> CARTOS allows about 2,000 requests per 5 minutes per address. This page waits between keystrokes, reuses answers it already has, shows at most 20 results at a time, and pauses when CARTOS says to slow down. Please do not script against it.</p>
+
+    <h2>Vocabulary licenses and required notices</h2>
+    <p>The terminology content shown on this page belongs to its stewards and is used under their terms. CARTOS's terms of use make each user responsible for following those terms, so here they are.</p>
+    <details>
+      <summary>SNOMED CT</summary>
+      <blockquote>This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of the International Health Terminology Standards Development Organisation (IHTSDO). All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. "SNOMED" and "SNOMED CT" are registered trademarks of the IHTSDO.</blockquote>
+      <p>That is the notice required by clause 8.3.1 of the <a href="https://www.snomed.org/get-snomed" target="_blank" rel="noopener">SNOMED CT Affiliate License Agreement</a>; the IHTSDO now trades as SNOMED International. The SNOMED CT version served by CARTOS is shown on each result. SNOMED CT US Edition is distributed in the United States by the National Library of Medicine. Use in the US is free of charge but requires the Affiliate License, obtained through the free <a href="https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html" target="_blank" rel="noopener">UMLS Metathesaurus License</a>. If you reuse this code, you are responsible for your own license.</p>
+    </details>
+    <details>
+      <summary>LOINC</summary>
+      <blockquote>This material contains content from LOINC (<a href="http://loinc.org" target="_blank" rel="noopener">http://loinc.org</a>). LOINC is copyright © Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at <a href="http://loinc.org/license" target="_blank" rel="noopener">http://loinc.org/license</a>. LOINC® is a registered United States trademark of Regenstrief Institute, Inc.</blockquote>
+    </details>
+    <details>
+      <summary>RxNorm</summary>
+      <blockquote>This product uses publicly available data courtesy of the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product.</blockquote>
+      <p>RxNorm content is subject to the <a href="https://www.nlm.nih.gov/research/umls/rxnorm/docs/termsofservice.html" target="_blank" rel="noopener">RxNorm terms of service</a>. Drug names shown here may lag the current RxNorm release; the version CARTOS served is shown on each result.</p>
+    </details>
+    <details>
+      <summary>ICD-10-CM, CVX, and HL7 value sets</summary>
+      <p>ICD-10-CM is maintained by the CDC National Center for Health Statistics and CVX by the CDC; both are works of the US government in the public domain. The US Core value sets used for word search are published by <a href="https://www.hl7.org/fhir/us/core/" target="_blank" rel="noopener">HL7 International</a>. HL7® and FHIR® are registered trademarks of Health Level Seven International. Material from HealthIT.gov is federal government information in the public domain; this page attributes it to HealthIT.gov as requested.</p>
+    </details>
+    <p><strong>As is.</strong> The stewards above and the author of this page provide the content and the code without warranty of any kind, express or implied, and accept no liability for errors, omissions, or any use made of them.</p>
     <p id="stats"></p>
-    <p>A hobby project. <a href="https://github.com/jbrick2070/health-code-decoder" target="_blank" rel="noopener">Source on GitHub</a>. Not affiliated with ONC or any vocabulary steward.</p>
+    <p>The code of this page is © 2026 Jeffrey A. Brick and released under the <a href="https://github.com/jbrick2070/health-code-decoder/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>. <a href="https://github.com/jbrick2070/health-code-decoder" target="_blank" rel="noopener">Source on GitHub</a>. The MIT License covers the code only, not the terminology content.</p>
   </footer>
 </div>
 
@@ -176,15 +267,15 @@
   const CVX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
   const SYSTEMS = {
-    icd10cm: { key: 'icd10cm', url: 'http://hl7.org/fhir/sid/icd-10-cm', name: 'ICD-10-CM',
+    icd10cm: { key: 'icd10cm', url: 'http://hl7.org/fhir/sid/icd-10-cm', name: 'ICD-10-CM', color: 'var(--sys-icd10cm)',
       about: 'Diagnosis codes used on US medical bills and insurance claims. Maintained by the CDC National Center for Health Statistics.' },
-    sct: { key: 'sct', url: 'http://snomed.info/sct', name: 'SNOMED CT',
+    sct: { key: 'sct', url: 'http://snomed.info/sct', name: 'SNOMED CT', color: 'var(--sys-sct)',
       about: 'The clinical vocabulary inside electronic health records for problems, findings, and procedures.' },
-    loinc: { key: 'loinc', url: 'http://loinc.org', name: 'LOINC',
+    loinc: { key: 'loinc', url: 'http://loinc.org', name: 'LOINC', color: 'var(--sys-loinc)',
       about: 'Codes for lab tests, vital signs, and other clinical measurements. Maintained by the Regenstrief Institute.' },
-    rxnorm: { key: 'rxnorm', url: 'http://www.nlm.nih.gov/research/umls/rxnorm', name: 'RxNorm',
+    rxnorm: { key: 'rxnorm', url: 'http://www.nlm.nih.gov/research/umls/rxnorm', name: 'RxNorm', color: 'var(--sys-rxnorm)',
       about: 'Standard names and codes for medications in the US. Maintained by the National Library of Medicine.' },
-    cvx: { key: 'cvx', url: 'http://hl7.org/fhir/sid/cvx', name: 'CVX',
+    cvx: { key: 'cvx', url: 'http://hl7.org/fhir/sid/cvx', name: 'CVX', color: 'var(--sys-cvx)',
       about: "The CDC's codes for vaccines, used on immunization records." }
   };
   const systemByUrl = Object.fromEntries(Object.values(SYSTEMS).map(s => [s.url, s]));
@@ -192,17 +283,17 @@
   // Searchable groups, in the order they are always shown. Each value set was verified to support `filter` on CARTOS.
   const GROUPS = [
     { key: 'conditions', title: 'Conditions and diagnoses', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-condition-code',
-      systems: ['icd10cm', 'sct'], about: 'SNOMED CT problems and ICD-10-CM billing diagnoses.' },
+      systems: ['icd10cm', 'sct'], color: 'var(--sys-icd10cm)', about: 'SNOMED CT problems and ICD-10-CM billing diagnoses.' },
     { key: 'meds', title: 'Medications', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-medication-codes',
-      systems: ['rxnorm'], about: 'RxNorm drug names, strengths, and forms. Search by ingredient or brand, not by the condition it treats.' },
+      systems: ['rxnorm'], color: 'var(--sys-rxnorm)', about: 'RxNorm drug names, strengths, and forms. Search by ingredient or brand, not by the condition it treats.' },
     { key: 'labs', title: 'Lab tests and measurements', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-laboratory-test-codes',
-      systems: ['loinc'], about: 'LOINC codes for lab tests.' },
+      systems: ['loinc'], color: 'var(--sys-loinc)', about: 'LOINC codes for lab tests.' },
     { key: 'procedures', title: 'Procedures', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-code',
-      systems: ['sct'], about: 'SNOMED CT procedures.' },
+      systems: ['sct'], color: 'var(--sys-sct)', about: 'SNOMED CT procedures.' },
     { key: 'vaccines', title: 'Vaccines', local: true,
-      systems: ['cvx'], about: 'CDC CVX vaccine codes. This list is small, so it is downloaded once and searched on your device.' }
+      systems: ['cvx'], color: 'var(--sys-cvx)', about: 'CDC CVX vaccine codes. This list is small, so it is downloaded once and searched on your device.' }
   ];
-  const CATS = [{ key: 'all', label: 'Everything' }].concat(GROUPS.map(g => ({ key: g.key, label: g.title.split(' and ')[0] })));
+  const CATS = [{ key: 'all', label: 'Everything', color: 'var(--accent)' }].concat(GROUPS.map(g => ({ key: g.key, label: g.title.split(' and ')[0], color: g.color })));
   const EXAMPLES = ['diabetes', 'E11.9', 'metformin', '208', 'glucose', '73211009', 'appendectomy', 'B12'];
 
   // ---------- Small helpers ----------
@@ -212,6 +303,7 @@
     for (const [k, v] of Object.entries(attrs)) {
       if (v == null) continue;
       if (k === 'class') n.className = v;
+      else if (k === 'style') n.style.cssText = v;
       else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
       else n.setAttribute(k, v);
     }
@@ -222,6 +314,11 @@
   const stats = { requests: 0, cacheHits: 0 };
   function renderStats() {
     $('#stats').textContent = `This visit: ${stats.requests} live request${stats.requests === 1 ? '' : 's'} to CARTOS, ${stats.cacheHits} answered from memory.`;
+  }
+  function setLive(state) {
+    const d = $('#livedot');
+    d.className = 'dot' + (state ? ' ' + state : '');
+    d.title = state === 'live' ? 'Connected to CARTOS' : state === 'warn' ? 'CARTOS asked us to slow down' : state === 'err' ? 'Could not reach CARTOS' : '';
   }
 
   // ---------- Session cache and rate-limit awareness ----------
@@ -242,14 +339,16 @@
     stats.requests++; renderStats();
     let res;
     try { res = await fetch(url, { headers: { Accept: 'application/fhir+json' } }); }
-    catch { throw new Error('Could not reach CARTOS. Check your connection and try again.'); }
+    catch { setLive('err'); throw new Error('Could not reach CARTOS. Check your connection and try again.'); }
     if (res.status === 429) {
       const ra = parseInt(res.headers.get('Retry-After') || '30', 10);
       blockedUntil = Date.now() + ra * 1000;
+      setLive('warn');
       throw new RateLimited(ra);
     }
     const body = await res.json().catch(() => null);
     if (!res.ok && !(body && body.resourceType === 'OperationOutcome')) throw new Error(`CARTOS returned HTTP ${res.status}.`);
+    setLive('live');
     mem.set(url, body); // a "not found" OperationOutcome is a stable answer too
     return body;
   }
@@ -371,10 +470,11 @@
 
   // ---------- Rendering ----------
   const out = $('#out');
+  const sysColor = systemUrl => (systemByUrl[systemUrl] || {}).color || 'var(--sys-other)';
 
   function sysTag(systemUrl) {
     const s = systemByUrl[systemUrl];
-    return el('span', { class: 'tag', title: systemUrl }, s ? s.name : (systemUrl || '').replace(/^https?:\/\//, ''));
+    return el('span', { class: 'tag', title: systemUrl, style: `--sys:${sysColor(systemUrl)}` }, s ? s.name : (systemUrl || '').replace(/^https?:\/\//, ''));
   }
 
   function copyButton(text) {
@@ -390,7 +490,7 @@
   // Internal flags that mean nothing to a member of the public. They stay visible in the raw FHIR.
   const HIDDEN_PROPS = new Set(['display', 'parent', 'child', 'OrderNumber', 'NonVaccine', 'Suppress', 'RXN_PRESCRIBABLE', 'TTY']);
   function renderExact(hit, note) {
-    const card = el('div', { class: 'card exact' });
+    const card = el('div', { class: 'card', style: `--sys:${hit.sys.color || 'var(--accent)'}` });
     const label = hit.display || '(no label returned)';
     card.append(el('div', { class: 'top' }, el('p', { class: 'display' }, label), copyButton(`${hit.code} — ${label} (${hit.sys.name}${hit.version ? ' ' + hit.version : ''})`)));
     const meta = el('div', { class: 'meta' }, el('span', {}, el('span', { class: 'code' }, hit.code)), sysTag(hit.sys.url));
@@ -410,24 +510,24 @@
       }
       card.append(dl);
     }
-    if (hit.raw) card.append(el('details', {}, el('summary', {}, 'Show the raw FHIR response'), el('pre', {}, JSON.stringify(hit.raw, null, 2))));
+    if (hit.raw) card.append(el('details', { class: 'raw' }, el('summary', {}, 'Show the raw FHIR response'), el('pre', {}, JSON.stringify(hit.raw, null, 2))));
     return card;
   }
 
   function renderRow(item) {
     const li = el('li');
-    const btn = el('button', { class: 'row', type: 'button', title: 'Decode this code', onclick: () => runQuery(item.code, { system: item.system }) },
+    const btn = el('button', { class: 'row', type: 'button', title: 'Decode this code', style: `--sys:${sysColor(item.system)}`, onclick: () => runQuery(item.code, { system: item.system }) },
       el('span', { class: 'code' }, item.code),
       el('span', { class: 'disp' }, item.display || ''),
-      el('span', {}, sysTag(item.system), item.inactive ? el('span', { class: 'tag inactive' }, ' inactive') : null));
+      el('span', {}, sysTag(item.system), item.inactive ? el('span', { class: 'tag inactive', style: 'margin-left:6px' }, 'inactive') : null));
     li.append(btn);
     return li;
   }
 
   function groupShell(group) {
-    const sec = el('section', { class: 'group' });
+    const sec = el('section', { class: 'group', style: `--cat:${group.color}` });
     const count = el('span', { class: 'count' }, 'searching…');
-    sec.append(el('h2', {}, group.title, count), el('p', { class: 'about' }, group.about));
+    sec.append(el('h2', {}, el('span', { class: 'swatch', 'aria-hidden': 'true' }), group.title, count), el('p', { class: 'about' }, group.about));
     const body = el('div');
     sec.append(body);
     return { sec, count, body };
@@ -487,7 +587,7 @@
     }
 
     setStatus('Looking up…');
-    const exactSec = el('section', { class: 'group hidden' }, el('h2', {}, plan.lookups.length > 1 ? 'Exact matches' : 'Exact match'));
+    const exactSec = el('section', { class: 'group hidden', style: '--cat:var(--accent)' }, el('h2', {}, el('span', { class: 'swatch', 'aria-hidden': 'true' }), plan.lookups.length > 1 ? 'Exact matches' : 'Exact match'));
     out.append(exactSec);
     const shells = new Map();
     for (const g of plan.groups) { const s = groupShell(g); shells.set(g.key, s); out.append(s.sec); }
@@ -499,7 +599,7 @@
       exactSystems.add(hit.sys.url);
       exactSec.append(renderExact(hit, note));
       exactSec.classList.remove('hidden');
-      if (exactSystems.size > 1) exactSec.querySelector('h2').textContent = 'Exact matches: this number exists in more than one vocabulary';
+      if (exactSystems.size > 1) exactSec.querySelector('h2').lastChild.textContent = 'Exact matches: this number exists in more than one vocabulary';
     };
 
     const lookupTasks = plan.lookups.map(l => lookup(l.sys, l.code).then(hit => {
@@ -534,7 +634,7 @@
           // Decoding a code: if the direct lookup failed but the list has that exact code, promote it to an exact card.
           const exact = res.items.find(it => it.code.toUpperCase() === plan.code.toUpperCase());
           if (exact && !exactSystems.has(exact.system)) {
-            const sys = systemByUrl[exact.system] || { url: exact.system, name: exact.system, about: '' };
+            const sys = systemByUrl[exact.system] || { url: exact.system, name: exact.system, about: '', color: 'var(--sys-other)' };
             const why = sys === SYSTEMS.loinc ? ' That happens for some LOINC codes on CARTOS.' : '';
             addExact({ sys, code: exact.code, display: exact.display, version: exact.version, props: exact.inactive ? [{ code: 'inactive', value: true }] : [] },
               `Found in the ${g.title.toLowerCase()} list. A direct lookup of this code did not answer.${why}`);
@@ -558,9 +658,8 @@
     }, 6000);
     const settled = await Promise.allSettled([...lookupTasks, ...checkTasks, ...groupTasks]);
     clearTimeout(slowHint);
-    const tasks = settled;
     if (my !== seq) return;
-    if (exactHits === 1) exactSec.querySelector('h2').textContent = 'Exact match';
+    if (exactHits === 1) exactSec.querySelector('h2').lastChild.textContent = 'Exact match';
 
     const emptyGroups = plan.groups.filter(g => groupHadItems[g.key] === false).map(g => g.title.toLowerCase());
     if (emptyGroups.length && emptyGroups.length < plan.groups.length) {
@@ -571,7 +670,7 @@
     const rl = errors.find(e => e instanceof RateLimited);
     const anything = exactHits > 0 || Object.values(groupHadItems).some(Boolean);
     if (rl) setStatus(rl.message, 'warn');
-    else if (errors.length && errors.length === tasks.length) setStatus(errors[0].message, 'err');
+    else if (errors.length && errors.length === settled.length) setStatus(errors[0].message, 'err');
     else if (errors.length) setStatus('Some sources did not answer: ' + errors[0].message, 'warn');
     else if (!anything) {
       setStatus(plan.code
@@ -596,7 +695,7 @@
   const catsRow = $('#cats');
   const catButtons = new Map();
   for (const c of CATS) {
-    const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(c.key === cat), onclick: () => setCat(c.key) }, c.label);
+    const b = el('button', { class: 'chip', type: 'button', style: `--cat:${c.color}`, 'aria-pressed': String(c.key === cat), onclick: () => setCat(c.key) }, c.label);
     catButtons.set(c.key, b);
     catsRow.append(b);
   }
@@ -608,7 +707,7 @@
   }
 
   const ex = $('#examples');
-  for (const x of EXAMPLES) ex.append(el('button', { class: 'chip', type: 'button', onclick: () => { input.value = x; runQuery(x); } }, x));
+  for (const x of EXAMPLES) ex.append(el('button', { class: 'chip ex', type: 'button', onclick: () => { input.value = x; runQuery(x); } }, x));
 
   renderStats();
   const params = new URLSearchParams(location.hash.replace(/^#/, ''));

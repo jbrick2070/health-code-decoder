@@ -69,8 +69,30 @@ make word search the primary experience, show every plausible system for a bare 
 guessing, add category narrowing, treat a missing code as inconclusive rather than invalid, keep
 persistent caching minimal, and surface inactive status and steward attributions.
 
-## Licenses
+## Terms, licenses, and disclaimers
 
-SNOMED CT © SNOMED International (US Edition via NLM). LOINC © Regenstrief Institute. RxNorm from
-NLM. ICD-10-CM from CDC/NCHS. CVX from CDC. Use of each is subject to its steward's terms.
-This tool is informational only and is not medical advice.
+**Code:** MIT License, see [LICENSE](LICENSE). The license covers the code only, not the terminology.
+
+**CARTOS terms of use** (from the [Cartos User Guide](https://healthit.gov/resources/cartos-oncs-terminology-service/),
+checked 2026-09-02): the API is "intended for terminology discovery, design-time queries and
+validation, research, and periodic retrieval of terminology content"; "production clinical
+applications must not rely on the Cartos API for direct runtime terminology queries"; do not
+bulk-harvest or work around rate limits; and "users are responsible for following the licensing,
+attribution, redistribution, and use requirements for each code system." This page is an
+educational discovery tool that makes small interactive lookups within the published limits. It is
+not a clinical or production system and says so on the page.
+
+**Vocabulary notices** shown verbatim in the page footer:
+
+- **SNOMED CT** requires the SNOMED CT Affiliate License even though use in the US is free. US
+  users get it through the free [UMLS Metathesaurus License](https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html)
+  (sign up at UTS). If you run your own copy of this page, register your own license.
+- **LOINC** is free under the [LOINC license](https://loinc.org/license/), which requires the LOINC
+  copyright notice on any product or online service that includes LOINC content.
+- **RxNorm** is public data from NLM under the [RxNorm terms of service](https://www.nlm.nih.gov/research/umls/rxnorm/docs/termsofservice.html),
+  which require the NLM courtesy statement and forbid implying NLM endorsement.
+- **ICD-10-CM** and **CVX** are US government works in the public domain. The US Core value sets
+  are published by HL7 International; HL7® and FHIR® are registered trademarks of HL7.
+
+**Disclaimers:** not medical advice, not affiliated with or endorsed by ONC, HHS, NLM, CDC,
+SNOMED International, Regenstrief, or HL7; provided as is without warranty.
