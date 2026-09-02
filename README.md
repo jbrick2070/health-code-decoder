@@ -57,8 +57,24 @@ Base URL: `https://cartos.healthit.gov/TerminologyServer/R4`.
 - A hyphenated code used as an `$expand` filter takes CARTOS about 13 seconds. Avoid it.
 - CARTOS intermittently stalls on a random request for a minute or more while an identical repeat
   answers in under a second (seen 2026-09-02 afternoon, not tied to URL form, origin, or cache).
-  The page sends one duplicate after 8 seconds of silence, takes the first answer, and gives up
-  at 45 seconds with a plain message.
+  The page sends one duplicate after 8 seconds of silence, takes the first complete response
+  (headers and body), cancels the loser, and gives up at 45 seconds with a plain message.
+- Caching policy: only complete successful bodies and HTTP 400/404 OperationOutcomes (a stable
+  "not found") are kept for the visit. Server errors, unreadable bodies, and 429s are never cached.
+  `Retry-After` is honored whether it is seconds or an HTTP date.
+- The CVX CodeSystem concept list carries no properties, so retired vaccine codes can only be
+  flagged on the decoded card (from the source's `Status` property), not in search rows.
+
+## QA
+
+Reviewed on 2026-09-02 with a kibitz panel: Codex (gpt-5.6-sol), Cursor (grok-4.6), and a
+Claude Sonnet subagent, each reading the repo independently, with every claim grounded against the
+code before anything changed. Artifacts, including the driver anchor, each review, and the grounding
+judgment, are under `kibitz-runs/2026-09-02-decoder-qa/r4/`. Fixes that came out of it: U-series
+ICD-10-CM codes, category chips no longer turning a LOINC code into a slow filter or leaking LOINC
+into other categories, a hedge that races complete responses, a stricter cache, tri-state group
+results, cancelled debounces, focus rings and chip contrast, a spoken completion tally, visible
+steward notices, and a `sys` parameter in shareable links.
 - A lookup miss is an HTTP 400 with an OperationOutcome body. The browser console logs each one as
   a failed resource load; that is expected and harmless.
 - Whole-vocabulary text search is not exposed; searching goes through value sets, so a valid code

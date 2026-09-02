@@ -86,6 +86,11 @@
   a { color: var(--accent); }
   .wrap { max-width: 900px; margin: 0 auto; padding: 28px 18px 56px; }
 
+  /* Keyboard focus must be visible everywhere, including on buttons that reset native styles. */
+  .chip:focus-visible, .copy:focus-visible, .more button:focus-visible, .search button:focus-visible, details summary:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+
   /* ---------- Hero ---------- */
   .badge {
     display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 9px; border-radius: 999px;
@@ -99,10 +104,11 @@
   .badge .dot.warn { background: var(--warn); }
   .badge .dot.err { background: var(--err); }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
-  h1 {
-    margin: 14px 0 6px; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; letter-spacing: -0.03em;
-    background: linear-gradient(92deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  h1 { margin: 14px 0 6px; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; letter-spacing: -0.03em; color: var(--accent); }
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    h1 { background: linear-gradient(92deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   }
+  @media (forced-colors: active) { h1 { background: none; color: CanvasText; } }
   p.lede { margin: 0 0 12px; color: var(--muted); font-size: 1.05rem; max-width: 62ch; }
   details.about { margin: 0 0 20px; }
   details.about summary { color: var(--accent); font-size: 0.92rem; cursor: pointer; }
@@ -131,7 +137,7 @@
     background: color-mix(in srgb, var(--panel) 80%, transparent); color: var(--ink); cursor: pointer; transition: transform .12s, border-color .12s, background .12s;
   }
   .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .chip[aria-pressed="true"] { background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: #fff; font-weight: 600; }
+  .chip[aria-pressed="true"] { background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: var(--accent-ink); font-weight: 600; }
   .chip.ex { font-family: var(--mono); font-size: 0.82rem; }
   .status { margin: 12px 0 0; min-height: 1.5em; color: var(--muted); font-size: 0.92rem; }
   .status.err { color: var(--err); }
@@ -143,6 +149,7 @@
   section.group h2 { font-size: 1.08rem; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   section.group h2 .swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--cat, var(--accent)); flex: none; }
   section.group h2 .count { color: var(--muted); font-weight: 500; font-size: 0.82rem; padding: 2px 9px; border-radius: 999px; background: var(--chip); }
+  section.group h2 .count.error { color: var(--err); }
   section.group p.about { margin: 0 0 10px; color: var(--muted); font-size: 0.9rem; }
   p.note { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; }
 
@@ -172,7 +179,8 @@
   ul.results li button.row {
     all: unset; cursor: pointer; width: 100%; display: grid; grid-template-columns: minmax(96px, max-content) 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; box-sizing: border-box; transition: background .12s;
   }
-  ul.results li button.row:hover, ul.results li button.row:focus-visible { background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+  ul.results li button.row:hover { background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+  ul.results li button.row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
   ul.results .disp { overflow-wrap: anywhere; }
   .more { margin-top: 10px; }
   .more button { font: inherit; font-size: 0.9rem; padding: 7px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
@@ -186,7 +194,8 @@
   footer p { margin: 6px 0; max-width: 80ch; }
   footer details { margin: 8px 0; }
   footer details summary { cursor: pointer; color: var(--accent); }
-  footer blockquote { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--line); background: color-mix(in srgb, var(--panel) 70%, transparent); border-radius: 0 8px 8px 0; }
+  footer blockquote { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--line); background: color-mix(in srgb, var(--panel) 70%, transparent); border-radius: 0 8px 8px 0; max-width: 80ch; }
+  footer blockquote strong { color: var(--ink); }
   .hidden { display: none !important; }
   @media (prefers-reduced-motion: reduce) { section.group { animation: none; } .badge .dot.live { animation: none; } .chip:hover { transform: none; } }
   @media (max-width: 560px) {
@@ -217,37 +226,28 @@
   </form>
   <div class="row-chips" id="cats" role="group" aria-label="Narrow results to one kind of record"><span class="lbl">Narrow to:</span></div>
   <div class="row-chips" id="examples"><span class="lbl">Try:</span></div>
-  <div class="status" id="status" aria-live="polite"></div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
 
   <main id="out"></main>
 
   <footer>
     <h2>About this page</h2>
-    <p><strong>Where the answers come from.</strong> Every result is fetched live from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a>, the public FHIR terminology service run by ONC, part of the US Department of Health and Human Services. When you search, your query is sent from your browser directly to cartos.healthit.gov, where <a href="https://healthit.gov/healthit-gov-privacy-policy-notice/" target="_blank" rel="noopener">HealthIT.gov's privacy policy</a> applies. This page has no server of its own, sets no cookies, runs no analytics, and stores nothing except a copy of the small vaccine list in your browser.</p>
-    <p><strong>An educational demo, not a clinical or production tool.</strong> CARTOS is intended for terminology discovery, learning, testing, and research, and this page uses it that way: one interactive lookup at a time, at the pace a person types, within CARTOS's published rate limits. Do not use this page, or the CARTOS API behind it, inside a production clinical system or for patient care decisions. Organizations that need terminology at runtime should run their own terminology service.</p>
+    <p><strong>Where the answers come from.</strong> Every result is fetched live from <a href="https://healthit.gov/standards-and-technology/cartos/" target="_blank" rel="noopener">CARTOS</a>, the public FHIR terminology service run by ONC, part of the US Department of Health and Human Services. When you search, your query is sent from your browser directly to cartos.healthit.gov, where <a href="https://healthit.gov/healthit-gov-privacy-policy-notice/" target="_blank" rel="noopener">HealthIT.gov's privacy policy</a> applies. This page has no server of its own, sets no cookies, runs no analytics, and stores nothing except a copy of the small vaccine list in your browser. Your search also appears in the page address after the # sign, so a bookmarked or shared link carries the words or code you typed. Do not type anything that identifies a person.</p>
+    <p><strong>An educational demo, not a clinical or production tool.</strong> ONC describes the CARTOS API as intended for terminology discovery, design-time queries and validation, research, and periodic retrieval of terminology content, and says production clinical applications must not rely on it for runtime queries (Cartos User Guide, as of September 2, 2026). This page uses it the way ONC intends: one interactive lookup at a time, at the pace a person types, within the published rate limits. Do not use this page, or the CARTOS API behind it, inside a production clinical system or for patient care decisions. Organizations that need terminology at runtime should run their own terminology service.</p>
     <p><strong>Not medical advice.</strong> A code's official label is the name a computer system uses for it. It is not a diagnosis, a treatment recommendation, or an explanation of your care, and terms shown here may be out of date or incomplete. Talk to your clinician about anything on your records.</p>
     <p><strong>No affiliation or endorsement.</strong> This is an independent hobby project. It is not affiliated with, endorsed by, or supported by ONC, HHS, the National Library of Medicine, the CDC, SNOMED International, Regenstrief Institute, or HL7 International. Reference to those organizations and their vocabularies is for attribution only.</p>
     <p><strong>What it covers, and what it can't.</strong> Word searches go through the HL7 US Core value sets for conditions, medications, lab tests, and procedures, plus the CDC CVX list. A code that is missing here may still be valid; it may sit outside those lists or belong to a code set CARTOS does not carry, such as CPT, HCPCS, or NDC. A code is never "wrong" just because this page cannot find it.</p>
     <p><strong>Be gentle with a shared service.</strong> CARTOS allows about 2,000 requests per 5 minutes per address. This page waits between keystrokes, reuses answers it already has, shows at most 20 results at a time, and pauses when CARTOS says to slow down. Please do not script against it.</p>
 
     <h2>Vocabulary licenses and required notices</h2>
-    <p>The terminology content shown on this page belongs to its stewards and is used under their terms. CARTOS's terms of use make each user responsible for following those terms, so here they are.</p>
+    <p>The terminology content shown on this page belongs to its stewards and is used under their terms. CARTOS's terms of use make each user responsible for following those terms, so here they are, in the wording each steward requires.</p>
+    <blockquote><strong>SNOMED CT.</strong> This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of the International Health Terminology Standards Development Organisation (IHTSDO). All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. "SNOMED" and "SNOMED CT" are registered trademarks of the IHTSDO.</blockquote>
+    <blockquote><strong>LOINC.</strong> This material contains content from LOINC (<a href="http://loinc.org" target="_blank" rel="noopener">http://loinc.org</a>). LOINC is copyright © Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at <a href="http://loinc.org/license" target="_blank" rel="noopener">http://loinc.org/license</a>. LOINC® is a registered United States trademark of Regenstrief Institute, Inc.</blockquote>
+    <blockquote><strong>RxNorm.</strong> This product uses publicly available data courtesy of the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product.</blockquote>
     <details>
-      <summary>SNOMED CT</summary>
-      <blockquote>This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of the International Health Terminology Standards Development Organisation (IHTSDO). All rights reserved. SNOMED CT®, was originally created by The College of American Pathologists. "SNOMED" and "SNOMED CT" are registered trademarks of the IHTSDO.</blockquote>
-      <p>That is the notice required by clause 8.3.1 of the <a href="https://www.snomed.org/get-snomed" target="_blank" rel="noopener">SNOMED CT Affiliate License Agreement</a>; the IHTSDO now trades as SNOMED International. The SNOMED CT version served by CARTOS is shown on each result. SNOMED CT US Edition is distributed in the United States by the National Library of Medicine. Use in the US is free of charge but requires the Affiliate License, obtained through the free <a href="https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html" target="_blank" rel="noopener">UMLS Metathesaurus License</a>. If you reuse this code, you are responsible for your own license.</p>
-    </details>
-    <details>
-      <summary>LOINC</summary>
-      <blockquote>This material contains content from LOINC (<a href="http://loinc.org" target="_blank" rel="noopener">http://loinc.org</a>). LOINC is copyright © Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at <a href="http://loinc.org/license" target="_blank" rel="noopener">http://loinc.org/license</a>. LOINC® is a registered United States trademark of Regenstrief Institute, Inc.</blockquote>
-    </details>
-    <details>
-      <summary>RxNorm</summary>
-      <blockquote>This product uses publicly available data courtesy of the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product.</blockquote>
-      <p>RxNorm content is subject to the <a href="https://www.nlm.nih.gov/research/umls/rxnorm/docs/termsofservice.html" target="_blank" rel="noopener">RxNorm terms of service</a>. Drug names shown here may lag the current RxNorm release; the version CARTOS served is shown on each result.</p>
-    </details>
-    <details>
-      <summary>ICD-10-CM, CVX, and HL7 value sets</summary>
+      <summary>More about these licenses, and the public-domain sources</summary>
+      <p>The SNOMED CT notice is the text required by clause 8.3.1 of the <a href="https://www.snomed.org/get-snomed" target="_blank" rel="noopener">SNOMED CT Affiliate License Agreement</a>; the IHTSDO now trades as SNOMED International. The SNOMED CT US Edition version CARTOS served is shown on each decoded result. SNOMED CT US Edition is distributed in the United States by the National Library of Medicine. Use in the US is free of charge but requires the Affiliate License, obtained through the free <a href="https://www.nlm.nih.gov/healthit/snomedct/snomed_licensing.html" target="_blank" rel="noopener">UMLS Metathesaurus License</a>. If you reuse this code, you are responsible for your own license.</p>
+      <p>RxNorm content is subject to the <a href="https://www.nlm.nih.gov/research/umls/rxnorm/docs/termsofservice.html" target="_blank" rel="noopener">RxNorm terms of service</a>. Drug names shown here may lag the current RxNorm release; the RxNorm version CARTOS served is shown on each decoded result.</p>
       <p>ICD-10-CM is maintained by the CDC National Center for Health Statistics and CVX by the CDC; both are works of the US government in the public domain. The US Core value sets used for word search are published by <a href="https://www.hl7.org/fhir/us/core/" target="_blank" rel="noopener">HL7 International</a>. HL7® and FHIR® are registered trademarks of Health Level Seven International. Material from HealthIT.gov is federal government information in the public domain; this page attributes it to HealthIT.gov as requested.</p>
     </details>
     <p><strong>As is.</strong> The stewards above and the author of this page provide the content and the code without warranty of any kind, express or implied, and accept no liability for errors, omissions, or any use made of them.</p>
@@ -263,6 +263,8 @@
   // ---------- Configuration ----------
   const BASE = 'https://cartos.healthit.gov/TerminologyServer/R4';
   const PAGE = 20;
+  const HEDGE_AFTER_MS = 8000;
+  const CEILING_MS = 45000;
   const CVX_CACHE_KEY = 'cartos:cvx:v1';
   const CVX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -291,10 +293,10 @@
     { key: 'procedures', title: 'Procedures', vs: 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-code',
       systems: ['sct'], color: 'var(--sys-sct)', about: 'SNOMED CT procedures.' },
     { key: 'vaccines', title: 'Vaccines', local: true,
-      systems: ['cvx'], color: 'var(--sys-cvx)', about: 'CDC CVX vaccine codes. This list is small, so it is downloaded once and searched on your device.' }
+      systems: ['cvx'], color: 'var(--sys-cvx)', about: 'CDC CVX vaccine codes. This list is small, so it is downloaded once and searched on your device. Retired codes are flagged on the decoded card, not in this list.' }
   ];
   const CATS = [{ key: 'all', label: 'Everything', color: 'var(--accent)' }].concat(GROUPS.map(g => ({ key: g.key, label: g.title.split(' and ')[0], color: g.color })));
-  const EXAMPLES = ['diabetes', 'E11.9', 'metformin', '208', 'glucose', '73211009', 'appendectomy', 'B12'];
+  const EXAMPLES = ['diabetes', 'E11.9', 'metformin', '208', 'glucose', '73211009', 'appendectomy', 'covid'];
 
   // ---------- Small helpers ----------
   const $ = sel => document.querySelector(sel);
@@ -320,6 +322,11 @@
     d.className = 'dot' + (state ? ' ' + state : '');
     d.title = state === 'live' ? 'Connected to CARTOS' : state === 'warn' ? 'CARTOS asked us to slow down' : state === 'err' ? 'Could not reach CARTOS' : '';
   }
+  function setStatus(msg, kind = '') {
+    const s = $('#status');
+    s.textContent = msg;
+    s.className = 'status' + (kind ? ' ' + kind : '');
+  }
 
   // ---------- Session cache and rate-limit awareness ----------
   const mem = new Map();
@@ -329,6 +336,21 @@
     constructor(seconds) { super(`CARTOS asked this page to slow down. Try again in about ${seconds} seconds.`); this.seconds = seconds; }
   }
 
+  // Retry-After may be delta-seconds or an HTTP date. Anything unreadable falls back to 30 s.
+  function parseRetryAfter(h) {
+    if (!h) return 30;
+    if (/^\d+$/.test(h.trim())) return Math.min(600, Math.max(1, parseInt(h, 10)));
+    const t = Date.parse(h);
+    if (Number.isNaN(t)) return 30;
+    return Math.min(600, Math.max(1, Math.ceil((t - Date.now()) / 1000)));
+  }
+
+  // One request to CARTOS, with three guards:
+  //  - Hedge: CARTOS occasionally stalls a random request for a minute or more while an identical repeat answers in well
+  //    under a second. After 8 s of silence a duplicate is sent and the first COMPLETE response (headers and body) wins.
+  //  - Ceiling: everything is abandoned at 45 s with a plain message.
+  //  - Cache: only complete successful bodies, plus HTTP 400/404 "not found" OperationOutcomes (a stable miss), are kept
+  //    for the visit. Server errors and unreadable bodies are never cached.
   async function fhir(path, params) {
     const qs = new URLSearchParams(params).toString();
     const url = `${BASE}/${path}${qs ? '?' + qs : ''}`;
@@ -336,61 +358,59 @@
     const wait = blockedUntil - Date.now();
     if (wait > 0) throw new RateLimited(Math.ceil(wait / 1000));
 
-    // CARTOS occasionally stalls on a random request for a minute or more while an identical repeat answers in
-    // well under a second. So: after 8 s of silence send one duplicate and take whichever answers first;
-    // give up cleanly at 45 s. This adds at most one extra request, and only to a stalled search.
     const headers = { Accept: 'application/fhir+json' };
-    const first = new AbortController(), hedge = new AbortController();
-    const ceiling = setTimeout(() => { first.abort(); hedge.abort(); }, 45000);
-    let hedgeTimer = null;
-    stats.requests++; renderStats();
-    const p1 = fetch(url, { headers, signal: first.signal });
-    const p2 = new Promise((resolve, reject) => {
-      hedgeTimer = setTimeout(() => { stats.requests++; renderStats(); fetch(url, { headers, signal: hedge.signal }).then(resolve, reject); }, 8000);
-    });
-    let res, winner = null;
-    const tag = (p, who) => p.then(r => { if (!winner) winner = who; return r; });
-    try { res = await Promise.race([tag(p1, 'first'), tag(p2, 'hedge')]); }
-    catch (e) {
-      clearTimeout(ceiling);
-      if (e && e.name === 'AbortError') throw new Error('CARTOS took more than 45 seconds to answer. It is having a slow moment; try again shortly.');
-      setLive('err'); throw new Error('Could not reach CARTOS. Check your connection and try again.');
+    const controllers = [];
+    let timedOut = false;
+    const attempt = async () => {
+      const ctrl = new AbortController(); controllers.push(ctrl);
+      stats.requests++; renderStats();
+      const res = await fetch(url, { headers, signal: ctrl.signal });
+      if (res.status === 429) return { res, body: null };
+      let body = null;
+      try { body = await res.json(); } catch { body = null; }
+      return { res, body };
+    };
+    const ceiling = setTimeout(() => { timedOut = true; controllers.forEach(c => c.abort()); }, CEILING_MS);
+    let hedgeTimer = null, result;
+    try {
+      result = await new Promise((resolve, reject) => {
+        let pending = 1; const failures = [];
+        const onFail = e => { failures.push(e); if (--pending === 0) reject(failures[0]); };
+        attempt().then(resolve, onFail);
+        hedgeTimer = setTimeout(() => { pending++; attempt().then(resolve, onFail); }, HEDGE_AFTER_MS);
+      });
+    } catch (e) {
+      if (timedOut) throw new Error('CARTOS took more than 45 seconds to answer. It is having a slow moment; try again shortly.');
+      setLive('err');
+      throw new Error('Could not reach CARTOS. Check your connection and try again.');
+    } finally {
+      clearTimeout(ceiling); clearTimeout(hedgeTimer);
+      controllers.forEach(c => c.abort()); // the winner has been fully read; this only cancels a still-pending loser
     }
-    finally {
-      clearTimeout(hedgeTimer);
-      // Cancel only the copy that lost; the winner's body still has to be read. Aborting a request that never started is harmless.
-      if (winner === 'first') hedge.abort();
-      if (winner === 'hedge') first.abort();
-    }
+
+    const { res, body } = result;
     if (res.status === 429) {
-      clearTimeout(ceiling);
-      const ra = parseInt(res.headers.get('Retry-After') || '30', 10);
+      const ra = parseRetryAfter(res.headers.get('Retry-After'));
       blockedUntil = Date.now() + ra * 1000;
       setLive('warn');
       throw new RateLimited(ra);
     }
-    let body = null;
-    try { body = await res.json(); } catch { body = null; } finally { clearTimeout(ceiling); }
-    if (!res.ok && !(body && body.resourceType === 'OperationOutcome')) throw new Error(`CARTOS returned HTTP ${res.status}.`);
+    if (body === null) throw new Error('CARTOS sent a response this page could not read. Try again shortly.');
+    const isMiss = !res.ok && (res.status === 400 || res.status === 404) && body.resourceType === 'OperationOutcome';
+    if (!res.ok && !isMiss) throw new Error(`CARTOS returned HTTP ${res.status}. Try again shortly.`);
     setLive('live');
-    mem.set(url, body); // a "not found" OperationOutcome is a stable answer too
+    mem.set(url, body);
     return body;
-  }
-
-  function setStatus(msg, kind = '') {
-    const s = $('#status');
-    s.textContent = msg;
-    s.className = 'status' + (kind ? ' ' + kind : '');
   }
 
   // ---------- Input classification ----------
   // Patterns are hints, not proof. Every plausible system is tried and every hit is shown.
   function classify(raw, cat) {
     const q = raw.trim();
-    const plan = { q, code: null, lookups: [], groups: [], filter: q };
+    const plan = { q, code: null, lookups: [], groups: [], filter: q, vsCheck: null, isLoinc: false };
     if (!q) return plan;
 
-    const icd = /^[A-TV-Z]\d[0-9A-Z](\.?[0-9A-Z]{0,4})$/i;
+    const icd = /^[A-Z]\d[0-9A-Z](\.?[0-9A-Z]{0,4})$/i;   // ICD-10-CM uses every letter including U (U07.1)
     const loinc = /^\d{1,5}-\d$/;
     const numeric = /^\d{1,18}$/;
 
@@ -401,7 +421,7 @@
       plan.lookups.push({ sys: SYSTEMS.icd10cm, code });
       plan.groups = GROUPS.filter(g => g.key === 'conditions');
     } else if (loinc.test(q)) {
-      plan.code = q;
+      plan.code = q; plan.isLoinc = true;
       plan.lookups.push({ sys: SYSTEMS.loinc, code: q });
       // A hyphenated code as a text filter takes CARTOS about 13 seconds; validate-code against the lab list answers in a fraction of a second.
       plan.vsCheck = { group: GROUPS.find(g => g.key === 'labs'), sys: SYSTEMS.loinc, code: q };
@@ -424,7 +444,9 @@
         // The pattern did not suggest this category, but the user asked for it: try its systems directly.
         for (const k of g.systems) plan.lookups.push({ sys: SYSTEMS[k], code: plan.code });
       }
-      plan.groups = [g];
+      if (plan.vsCheck && g.key !== 'labs') plan.vsCheck = null;
+      // A LOINC-shaped code must never become an $expand filter, whatever category is chosen.
+      plan.groups = plan.isLoinc ? [] : [g];
     }
     return plan;
   }
@@ -451,7 +473,8 @@
     if (!body || body.resourceType !== 'Parameters') return null;
     const p = {};
     for (const part of body.parameter || []) p[part.name] = part.valueBoolean ?? part.valueString ?? part.valueCode;
-    return p.result === true ? { sys, code, display: p.display, version: p.version, props: [], raw: body } : null;
+    const ok = p.result === true || p.result === 'true';
+    return ok ? { sys, code, display: p.display, version: p.version, props: [], raw: body } : null;
   }
 
   function rank(items, q) {
@@ -465,24 +488,28 @@
 
   async function expand(vs, filter, offset = 0) {
     const body = await fhir('ValueSet/$expand', { url: vs, filter, count: PAGE, offset });
-    if (!body || body.resourceType !== 'ValueSet') return { total: 0, items: [] };
+    // A cached "not found" or any other non-ValueSet answer is a failure to search, not an empty result.
+    if (!body || body.resourceType !== 'ValueSet') throw new Error('CARTOS could not search this list right now.');
     const ex = body.expansion || {};
-    const items = (ex.contains || []).map(c => ({ system: c.system, code: c.code, display: c.display, inactive: !!c.inactive }));
+    const items = (ex.contains || []).map(c => ({ system: c.system, code: c.code, display: c.display, version: c.version, inactive: !!c.inactive }));
     return { total: ex.total ?? items.length, items: offset === 0 ? rank(items, filter) : items };
   }
 
   let cvxList = null;
+  const validCvx = v => Array.isArray(v) && v.length > 0 && v.every(c => c && typeof c.code === 'string' && typeof c.display === 'string');
   async function getCvx() {
     if (cvxList) return cvxList;
     try {
       const raw = localStorage.getItem(CVX_CACHE_KEY);
-      if (raw) { const { t, v } = JSON.parse(raw); if (Date.now() - t < CVX_TTL_MS && Array.isArray(v) && v.length) { cvxList = v; return v; } }
+      if (raw) { const { t, v } = JSON.parse(raw); if (Date.now() - t < CVX_TTL_MS && validCvx(v)) { cvxList = v; return v; } }
     } catch {}
     const body = await fhir('CodeSystem', { url: SYSTEMS.cvx.url, _count: 1 });
     const cs = body?.entry?.[0]?.resource;
-    cvxList = (cs?.concept || []).map(c => ({ system: SYSTEMS.cvx.url, code: c.code, display: c.display, inactive: false, version: cs.version }));
-    try { localStorage.setItem(CVX_CACHE_KEY, JSON.stringify({ t: Date.now(), v: cvxList })); } catch {}
-    return cvxList;
+    const list = (cs?.concept || []).filter(c => c && c.code && c.display).map(c => ({ system: SYSTEMS.cvx.url, code: String(c.code), display: String(c.display), version: cs.version, inactive: false }));
+    if (!list.length) throw new Error('CARTOS returned an empty vaccine list. Try again shortly.');
+    cvxList = list;
+    try { localStorage.setItem(CVX_CACHE_KEY, JSON.stringify({ t: Date.now(), v: list })); } catch {}
+    return list;
   }
   function cvxSearch(list, q) {
     const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -504,7 +531,7 @@
   function copyButton(text) {
     const b = el('button', { class: 'copy', type: 'button', title: 'Copy code and label' }, 'Copy');
     b.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+      try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; setStatus('Copied to clipboard.'); }
       catch { b.textContent = 'Select and copy manually'; }
       setTimeout(() => (b.textContent = 'Copy'), 1500);
     });
@@ -522,13 +549,15 @@
     card.append(meta, el('p', { class: 'note' }, hit.sys.about));
     if (note) card.append(el('p', { class: 'note' }, note));
 
-    const shown = (hit.props || []).filter(p => !HIDDEN_PROPS.has(p.code) && p.value !== undefined && p.value !== null && p.value !== '');
+    let shown = (hit.props || []).filter(p => !HIDDEN_PROPS.has(p.code) && p.value !== undefined && p.value !== null && p.value !== '');
+    // When the source publishes its own status (CVX does), show that alone rather than two lines that can disagree.
+    if (shown.some(p => p.code === 'Status')) shown = shown.filter(p => p.code !== 'inactive');
     if (shown.length) {
       const dl = el('dl', { class: 'props' });
       for (const p of shown) {
         let k = p.code, v = String(p.value);
         if (p.code === 'inactive') { k = 'In use'; v = (p.value === true || p.value === 'true') ? 'No. Retired, but still resolvable for old records.' : 'Yes'; }
-        if (p.code === 'Status') { k = 'Status (per the source)'; }
+        if (p.code === 'Status') { k = 'Status (per the source)'; if (/^inactive$/i.test(v)) v = 'Inactive. Retired by the source, but still resolvable for old records.'; }
         if (p.code === 'Billable') { k = 'Billable'; v = v === '1' ? 'Yes. Specific enough to appear on a claim.' : 'No. This is a category heading; claims need a more specific code beneath it.'; }
         dl.append(el('dt', {}, k), el('dd', {}, v));
       }
@@ -557,16 +586,23 @@
     return { sec, count, body };
   }
 
-  function fillGroup(shell, group, result, loadMore) {
+  // Returns true when rows were rendered, false when the list was empty.
+  function fillGroup(shell, group, result, loadMore, my) {
     shell.count.textContent = result.total ? `${result.total.toLocaleString()} match${result.total === 1 ? '' : 'es'}` : 'no matches';
     shell.body.replaceChildren();
     if (!result.items.length) { shell.sec.classList.add('hidden'); return false; }
     const ul = el('ul', { class: 'results' });
     result.items.forEach(it => ul.append(renderRow(it)));
     shell.body.append(ul);
-    if (result.total > result.items.length) {
-      shell.body.append(el('p', { class: 'note' }, `Showing ${result.items.length} of ${result.total.toLocaleString()}. The first page is sorted so names that begin with your word come first; the rest are in the order CARTOS returned them, not by relevance.`));
-    }
+    const note = el('p', { class: 'note' });
+    const updateNote = () => {
+      if (result.total <= result.items.length) { note.remove(); return; }
+      note.textContent = group.local
+        ? `Showing ${result.items.length} of ${result.total.toLocaleString()} vaccine codes, sorted so names that begin with your word come first.`
+        : `Showing ${result.items.length} of ${result.total.toLocaleString()}. The first page is sorted so names that begin with your word come first; the rest are in the order CARTOS returned them, not by relevance.`;
+    };
+    updateNote();
+    shell.body.append(note);
     if (loadMore && result.items.length < result.total) {
       const more = el('div', { class: 'more' });
       const b = el('button', { type: 'button' }, `Show ${Math.min(PAGE, result.total - result.items.length)} more`);
@@ -574,11 +610,16 @@
         b.disabled = true; b.textContent = 'Loading…';
         try {
           const next = await loadMore(result.items.length);
+          if (my !== seq) return; // the user has moved on; this list is no longer on screen
           next.items.forEach(it => ul.append(renderRow(it)));
           result.items.push(...next.items);
+          updateNote();
           if (result.items.length >= result.total || !next.items.length) more.remove();
           else { b.disabled = false; b.textContent = `Show ${Math.min(PAGE, result.total - result.items.length)} more`; }
-        } catch (e) { setStatus(e.message, e instanceof RateLimited ? 'warn' : 'err'); b.disabled = false; b.textContent = 'Try again'; }
+        } catch (e) {
+          if (my !== seq) return;
+          setStatus(e.message, e instanceof RateLimited ? 'warn' : 'err'); b.disabled = false; b.textContent = 'Try again';
+        }
       });
       more.append(b);
       shell.body.append(more);
@@ -589,25 +630,32 @@
   // ---------- Orchestration ----------
   let seq = 0;
   let cat = 'all';
+  let timer = null;
 
-  function syncHash(q) {
-    const h = q ? '#q=' + encodeURIComponent(q) + (cat !== 'all' ? '&in=' + cat : '') : '';
-    history.replaceState(null, '', location.pathname + h);
+  function syncHash(q, sysKey) {
+    const parts = [];
+    if (q) parts.push('q=' + encodeURIComponent(q));
+    if (q && cat !== 'all') parts.push('in=' + cat);
+    if (q && sysKey) parts.push('sys=' + sysKey);
+    history.replaceState(null, '', location.pathname + (parts.length ? '#' + parts.join('&') : ''));
   }
 
   async function runQuery(raw, opts = {}) {
+    clearTimeout(timer); timer = null; // a pending debounce must never fire on top of an explicit action
     const my = ++seq;
     const plan = classify(raw, cat);
+    const sysHint = opts.system && systemByUrl[opts.system] ? systemByUrl[opts.system] : null;
     out.replaceChildren();
-    syncHash(plan.q);
+    syncHash(plan.q, sysHint ? sysHint.key : null);
     if (!plan.q) { setStatus(''); return; }
     $('#q').value = plan.q;
 
-    // A click on a result row already knows its system: decode just that.
-    if (opts.system && systemByUrl[opts.system]) {
-      plan.lookups = [{ sys: systemByUrl[opts.system], code: plan.q }];
+    // A click on a result row already knows its system: decode just that. LOINC still needs the lab-list fallback.
+    if (sysHint) {
+      plan.lookups = [{ sys: sysHint, code: plan.q }];
       plan.groups = [];
       plan.code = plan.q;
+      plan.vsCheck = sysHint === SYSTEMS.loinc ? { group: GROUPS.find(g => g.key === 'labs'), sys: SYSTEMS.loinc, code: plan.q } : null;
     }
 
     setStatus('Looking up…');
@@ -634,7 +682,7 @@
     const lookupsDone = Promise.allSettled(lookupTasks);
 
     const checkTasks = [];
-    if (plan.vsCheck && !opts.system) {
+    if (plan.vsCheck) {
       const { group, sys, code } = plan.vsCheck;
       checkTasks.push(validateInVs(group.vs, sys, code).then(async hit => {
         if (my !== seq || !hit) return;
@@ -644,19 +692,23 @@
       }));
     }
 
-    const groupHadItems = {};
+    // Per group: true = rows shown, false = empty, 'error' = the search itself failed.
+    const groupState = {};
+    const groupTotals = {};
     const groupTasks = plan.groups.map(g => {
       const shell = shells.get(g.key);
       const p = g.local
-        ? getCvx().then(list => { const items = cvxSearch(list, plan.filter); return { total: items.length, items: items.slice(0, 50) }; })
+        ? getCvx().then(list => { const items = cvxSearch(list, plan.filter); return { total: items.length, items: items.slice(0, PAGE), all: items }; })
         : expand(g.vs, plan.filter);
       return p.then(async res => {
         if (my !== seq) return;
+        groupTotals[g.key] = res.total;
         if (plan.code) {
           await lookupsDone;
           if (my !== seq) return;
           // Decoding a code: if the direct lookup failed but the list has that exact code, promote it to an exact card.
-          const exact = res.items.find(it => it.code.toUpperCase() === plan.code.toUpperCase());
+          const pool = res.all || res.items;
+          const exact = pool.find(it => it.code.toUpperCase() === plan.code.toUpperCase());
           if (exact && !exactSystems.has(exact.system)) {
             const sys = systemByUrl[exact.system] || { url: exact.system, name: exact.system, about: '', color: 'var(--sys-other)' };
             const why = sys === SYSTEMS.loinc ? ' That happens for some LOINC codes on CARTOS.' : '';
@@ -664,14 +716,18 @@
               `Found in the ${g.title.toLowerCase()} list. A direct lookup of this code did not answer.${why}`);
           }
           // Hide the list when it only repeats the exact card.
-          if (res.items.length === 1 && exact) { shell.sec.classList.add('hidden'); groupHadItems[g.key] = false; return; }
+          if (pool.length === 1 && exact) { shell.sec.classList.add('hidden'); groupState[g.key] = false; return; }
         }
-        groupHadItems[g.key] = fillGroup(shell, g, res, g.local ? null : (offset => expand(g.vs, plan.filter, offset)));
+        const loadMore = g.local
+          ? (offset => Promise.resolve({ total: res.all.length, items: res.all.slice(offset, offset + PAGE) }))
+          : (offset => expand(g.vs, plan.filter, offset));
+        groupState[g.key] = fillGroup(shell, g, res, loadMore, my);
       }, err => {
         if (my !== seq) return;
         shell.count.textContent = 'could not search';
+        shell.count.classList.add('error');
         shell.body.replaceChildren(el('div', { class: 'empty' }, err.message));
-        groupHadItems[g.key] = false;
+        groupState[g.key] = 'error';
         throw err;
       });
     });
@@ -685,14 +741,14 @@
     if (my !== seq) return;
     if (exactHits === 1) exactSec.querySelector('h2').lastChild.textContent = 'Exact match';
 
-    const emptyGroups = plan.groups.filter(g => groupHadItems[g.key] === false).map(g => g.title.toLowerCase());
+    const emptyGroups = plan.groups.filter(g => groupState[g.key] === false).map(g => g.title.toLowerCase());
     if (emptyGroups.length && emptyGroups.length < plan.groups.length) {
       out.append(el('p', { class: 'none' }, `No matches in ${emptyGroups.join(', ')}.`));
     }
 
     const errors = settled.filter(s => s.status === 'rejected').map(s => s.reason);
     const rl = errors.find(e => e instanceof RateLimited);
-    const anything = exactHits > 0 || Object.values(groupHadItems).some(Boolean);
+    const anything = exactHits > 0 || Object.values(groupState).some(v => v === true);
     if (rl) setStatus(rl.message, 'warn');
     else if (errors.length && errors.length === settled.length) setStatus(errors[0].message, 'err');
     else if (errors.length) setStatus('Some sources did not answer: ' + errors[0].message, 'warn');
@@ -700,20 +756,25 @@
       setStatus(plan.code
         ? `CARTOS did not return a match for "${plan.q}"${cat !== 'all' ? ' in ' + CATS.find(c => c.key === cat).label.toLowerCase() : ''}. That is inconclusive rather than proof the code is wrong: it may be in a code set CARTOS does not carry (CPT, HCPCS, NDC, a local lab code), or a vocabulary this page does not try. Check for typos or choose a different category above.`
         : `No matches for "${plan.q}". Try a shorter or more general word, or a different category above.`, 'warn');
-    } else setStatus('');
+    } else {
+      // Announce completion for screen readers and anyone who scrolled: a one-line tally.
+      const bits = [];
+      if (exactHits) bits.push(`${exactHits} exact match${exactHits === 1 ? '' : 'es'}`);
+      for (const g of plan.groups) if (groupState[g.key] === true) bits.push(`${(groupTotals[g.key] || 0).toLocaleString()} ${g.title.toLowerCase()}`);
+      setStatus('Found ' + bits.join(', ') + '.');
+    }
   }
 
   // ---------- Wiring ----------
   const input = $('#q');
-  let timer = null;
-  const clear = () => { seq++; out.replaceChildren(); setStatus(''); syncHash(''); };
+  const clear = () => { clearTimeout(timer); timer = null; seq++; out.replaceChildren(); setStatus(''); syncHash(''); };
   input.addEventListener('input', () => {
     clearTimeout(timer);
     const v = input.value.trim();
     if (v.length < 2) { clear(); return; }
     timer = setTimeout(() => runQuery(v), 400);
   });
-  $('#form').addEventListener('submit', e => { e.preventDefault(); clearTimeout(timer); runQuery(input.value); });
+  $('#form').addEventListener('submit', e => { e.preventDefault(); runQuery(input.value); });
   input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; clear(); } });
 
   const catsRow = $('#cats');
@@ -735,9 +796,9 @@
 
   renderStats();
   const params = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const q0 = params.get('q'), in0 = params.get('in');
+  const q0 = params.get('q'), in0 = params.get('in'), sys0 = params.get('sys');
   if (in0 && CATS.some(c => c.key === in0)) { cat = in0; for (const [k, b] of catButtons) b.setAttribute('aria-pressed', String(k === cat)); }
-  if (q0) { input.value = q0; runQuery(q0); }
+  if (q0) { input.value = q0; runQuery(q0, sys0 && SYSTEMS[sys0] ? { system: SYSTEMS[sys0].url } : {}); }
 })();
 </script>
 </body>
