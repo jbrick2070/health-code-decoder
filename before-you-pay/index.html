@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Know the number before you pay. Look up medication prices and hospital-published cash prices, understand the terminology, and take one useful question with you. By Jeffrey A. Brick.">
+<meta name="theme-color" content="#0b2545">
+<title>Before You Pay — health prices, in plain sight</title>
+<link rel="canonical" href="https://jbrick2070.github.io/health-code-decoder/before-you-pay/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b2545'/%3E%3Cpath d='M19 12h26v42l-6-4-7 4-7-4-6 4z' fill='white'/%3E%3Cpath d='M25 24h14M25 32h14M25 40h8' stroke='%230b5fa5' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+:root{--navy:#0b2545;--blue:#0969b2;--sky:#a9d4ff;--paper:#fff;--ground:#edf1f5;--ink:#102b48;--muted:#53667a;--red:#b32e35;--rule:#dce3eb;--soft:#f4f7fa;--sans:Inter,"Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit}
+button,a,input,select,summary{touch-action:manipulation}
+button{cursor:pointer}
+button:disabled{cursor:wait;opacity:.65}
+a{color:var(--blue);text-underline-offset:4px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #4c9fee;outline-offset:4px}
+[hidden]{display:none!important}
+button svg,a svg{pointer-events:none}
+.wrap{max-width:1192px;margin:auto;padding:0 32px}
+.skip{position:absolute;top:-100px;left:20px;background:white;padding:12px;z-index:10}
+.skip:focus{top:12px}
+.masthead{background:var(--navy);color:white;border-top:4px solid var(--blue);position:relative}
+.masthead:before{content:"";position:absolute;top:-4px;left:0;height:4px;width:15%;background:var(--red)}
+.nav{min-height:87px;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid #ffffff25}
+.brand{color:white;text-decoration:none;font-weight:750;letter-spacing:-.4px;display:inline-flex;align-items:center;gap:12px}
+.brand svg{width:29px;height:36px;color:var(--sky)}
+.navlinks{display:flex;gap:27px;align-items:center;font-size:14px}
+.navlinks a{color:#dae8f6;text-decoration:none}
+.navlinks a:hover{color:white;text-decoration:underline}
+.independent{font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:#b3c9df;border-left:1px solid #ffffff30;padding-left:26px}
+.hero{display:grid;grid-template-columns:1.3fr .7fr;align-items:end;gap:36px;padding-top:40px;padding-bottom:121px}
+.eyebrow{font-size:12px;font-weight:750;letter-spacing:.13em;text-transform:uppercase}
+.hero .eyebrow{color:var(--sky);display:flex;align-items:center;gap:9px;margin:0 0 14px}
+.hero .eyebrow:before{content:"";display:inline-block;width:19px;height:2px;background:#e86a70}
+h1{font-size:clamp(38px,4.9vw,64px);font-weight:700;line-height:1.06;letter-spacing:-2.4px;margin:0}
+h1 span{color:var(--sky)}
+.hero-note{color:#d5e3f1;max-width:310px;justify-self:end;padding-bottom:3px}
+.hero-note p{font-size:18px;line-height:1.65;margin:0 0 13px}
+.hero-note small{font-size:13px;color:#aac4de}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);align-items:start;gap:32px;margin-top:-77px;position:relative}
+.search-card{background:white;border:1px solid var(--rule);border-radius:12px;box-shadow:0 8px 36px #061b3420;overflow:hidden}
+.search-title{padding:25px 28px 19px;display:flex;justify-content:space-between;align-items:center}
+.search-title h2{font-size:20px;margin:0;letter-spacing:-.5px}
+.step-label{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 28px;padding:4px;border-radius:8px;background:#eaf0f6}
+.tab{min-height:46px;border:0;border-radius:6px;display:flex;gap:8px;align-items:center;justify-content:center;color:var(--muted);background:transparent;font-size:15px;font-weight:650}
+.tab svg{width:19px;height:19px}
+.tab[aria-selected="true"]{color:var(--navy);background:white;box-shadow:0 1px 4px #0b25451f}
+.form-inner{padding:25px 28px 27px}
+.field-label{display:block;font-size:14px;font-weight:650;margin-bottom:7px}
+.field-hint{font-size:13px;color:var(--muted);margin:7px 0 0}
+.fields{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:12px}
+input,select{color:var(--ink);background:white;border:1px solid #aebdcd;border-radius:7px;padding:13px 12px;min-height:50px;max-width:100%;width:100%}
+input::placeholder{color:#748498}
+input:focus,select:focus{border-color:var(--blue)}
+input[inputmode="numeric"]{font-family:var(--mono)}
+.primary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:0;border-radius:7px;background:var(--blue);color:white;min-height:51px;padding:12px 17px;font-weight:650;text-decoration:none}
+.primary:hover{background:#075b9c}
+.primary svg{width:20px;height:20px}
+.form-inner .primary{margin-top:20px}
+.examples{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:13px}
+.example{border:1px solid var(--rule);border-radius:4px;background:var(--soft);padding:5px 8px;font-size:12px;color:var(--ink)}
+.example:hover{border-color:#88acd1;background:#eaf3fd}
+.form-note{margin:17px 0 0;font-size:12px;color:var(--muted);line-height:1.65}
+.status{margin:0 28px 20px;font-size:14px;padding:12px 14px;border-left:3px solid var(--blue);background:#edf5fe;border-radius:0 5px 5px 0}
+.status[data-kind="error"]{border-color:var(--red);background:#fff1f1;color:#8a252a}
+.candidates{padding:0 28px 25px}
+.candidates h3{margin:0 0 12px;font-size:15px}
+.candidate-list{max-height:290px;overflow:auto;padding:2px 3px}
+.candidate{display:flex;align-items:center;gap:12px;cursor:pointer;padding:13px 10px;border-bottom:1px solid var(--rule);font-size:14px}
+.candidate:last-child{border-bottom:0}
+.candidate:hover{background:var(--soft)}
+.candidate:has(input:checked){background:#edf5fe}
+.candidate input{appearance:auto;min-height:auto;width:17px;height:17px;padding:0;accent-color:var(--blue);flex-shrink:0}
+.candidate strong{display:block;font-weight:650}
+.candidate small{color:var(--muted);font-size:12px}
+.confirm-name{padding:14px;background:var(--soft);border-radius:6px;margin:0 0 14px}
+.confirm-name strong{display:block}
+.confirm-name small{font-size:12px;color:var(--muted)}
+.confirm-note{font-size:13px;color:var(--muted)}
+.steps{padding:26px 28px;display:grid;gap:18px}
+.step{display:grid;grid-template-columns:29px 1fr;gap:13px;align-items:start}
+.step-num{font-family:var(--mono);font-size:12px;border:1px solid #bbc8d6;border-radius:50%;width:27px;height:27px;display:grid;place-items:center;margin-top:1px}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+.step strong{display:block;color:var(--ink);font-weight:650;margin-bottom:1px}
+.paper-column{min-width:0;padding-top:2px}
+.printer-slot{height:5px;background:#071b32;border-radius:4px;box-shadow:0 2px 3px #0003;margin:0 -5px}
+.receipt{background:white;position:relative;padding:28px 31px 26px;box-shadow:0 16px 25px -16px #0b254555;border:1px solid #d6dee7;border-top:0;animation:print-in .28s ease-out}
+.receipt:after{content:"";position:absolute;height:12px;left:-1px;right:-1px;bottom:-11px;background:linear-gradient(135deg,white 25%,transparent 25%) -7px 0/14px 14px,linear-gradient(225deg,white 25%,transparent 25%) -7px 0/14px 14px;filter:drop-shadow(0 2px 0 #d6dee7)}
+.receipt-top{display:flex;gap:14px;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:1px dashed #b9c7d5}
+.receipt-label{font-family:var(--mono);font-size:12px;letter-spacing:.055em;text-transform:uppercase;color:var(--muted);max-width:210px}
+.stamp{color:var(--red);font-family:var(--mono);font-size:10px;line-height:1.45;letter-spacing:.04em;text-transform:uppercase;border:1px solid #cf878b;padding:5px 8px;transform:rotate(-3deg);text-align:center;flex-shrink:0}
+.receipt h2{font-size:27px;line-height:1.24;letter-spacing:-.65px;margin:24px 0 7px}
+.receipt-subtitle{color:var(--muted);font-size:14px;margin:0 0 22px}
+.line-items{margin:0;padding:0 0 19px;display:grid;gap:8px;border-bottom:1px dashed #b9c7d5}
+.line-items>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+.line-items dt{font-size:13px;color:var(--muted)}
+.line-items dd{font-size:14px;margin:0;text-align:right;font-weight:550}
+.price-line{display:flex;align-items:end;justify-content:space-between;gap:10px;padding-top:21px}
+.price-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:650;margin:0 0 4px}
+.price{font-family:var(--mono);font-size:clamp(56px,6.3vw,80px);line-height:1.15;letter-spacing:-5px;font-weight:500;font-variant-numeric:tabular-nums}
+.price-mark{width:41px;height:41px;border-radius:50%;border:1px solid #bcd2e6;display:grid;place-items:center;color:var(--blue);margin-bottom:12px}
+.price-mark svg{width:22px;height:22px}
+.extra{font-family:var(--mono);font-size:12px;color:var(--muted);margin:4px 0 19px}
+.source-line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:1px dashed #b9c7d5;padding-top:17px;font-size:12px}
+.source-line a{font-weight:650}
+.source-line span{color:var(--muted)}
+.subtle{font-size:12px;line-height:1.65;color:var(--muted);margin:12px 0 0}
+.receipt-actions{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:17px}
+.text-button{border:0;background:none;padding:3px 0;color:var(--blue);font-weight:650;font-size:13px;text-decoration:underline;text-underline-offset:4px}
+.outline-button{border:1px solid #a4bdd5;background:white;border-radius:5px;padding:8px 11px;color:var(--blue);font-size:13px;font-weight:650}
+.outline-button:hover{background:#edf5fe}
+.question{background:#eaf2fa;border-left:3px solid var(--blue);border-radius:0 5px 5px 0;margin-top:22px;padding:17px 18px}
+.question-head{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.question h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:0}
+.question blockquote{font-size:14px;line-height:1.7;margin:11px 0 0}
+.copy{border:1px solid #a4bdd5;border-radius:4px;padding:5px 10px;color:var(--blue);background:white;font-size:12px;font-weight:650;white-space:nowrap}
+.copy:hover{background:#f4faff}
+.terminology{margin-top:19px;border-top:1px dashed #b9c7d5;padding-top:16px}
+.term-result{font-size:13px;padding-top:12px}
+.term-result p{margin:0 0 9px}
+.term-result code{font-family:var(--mono);font-size:12px;border:1px solid var(--rule);background:var(--soft);border-radius:3px;padding:2px 5px}
+.term-result a{overflow-wrap:anywhere}
+.price-range{font-family:var(--mono);font-size:clamp(25px,3vw,35px);font-weight:500;letter-spacing:-1.6px;font-variant-numeric:tabular-nums;margin:9px 0 6px}
+.scope-note{font-size:13px;color:var(--muted);margin:0 0 19px}
+.facilities{margin:0 -4px}
+.facility{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;padding:16px 4px;border-bottom:1px dashed #b9c7d5}
+.facility:first-child{border-top:1px dashed #b9c7d5}
+.facility h3{font-size:13px;font-weight:650;line-height:1.45;margin:0}
+.facility p{font-size:11px;color:var(--muted);margin:3px 0 0}
+.facility .amount{font-size:20px;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.9px}
+.bar-track{height:3px;grid-column:1/-1;background:#e9eff5;margin-top:5px}
+.bar{display:block;height:3px;background:#78a9d2}
+.pending-receipt{text-align:center;padding:60px 15px}
+.pending-receipt svg{width:52px;height:52px;color:#7fa1c2}
+.pending-receipt h2{font-size:24px}
+.pending-receipt p{color:var(--muted);font-size:14px}
+.source-section{margin-top:65px;margin-bottom:31px;padding:29px 0;border-top:1px solid #cbd5e0;display:grid;grid-template-columns:.9fr 1fr 1fr;gap:34px}
+.source-section h2{font-size:19px;letter-spacing:-.4px;margin:6px 0 5px}
+.source-section h3{font-size:14px;margin:0 0 6px}
+.source-section p{font-size:13px;color:var(--muted);margin:0;line-height:1.75}
+.source-section .eyebrow{color:var(--blue);font-size:11px}
+.source-section a{font-weight:550}
+.about{border-top:1px solid #cbd5e0}
+.about summary{font-size:13px;font-weight:650;cursor:pointer;padding:18px 0}
+.about-content{display:grid;grid-template-columns:1fr 1fr;gap:30px;font-size:13px;color:var(--muted);padding:0 0 23px}
+.about-content p{margin:0 0 12px}
+.about-content h3{color:var(--ink);font-size:14px;margin:0 0 8px}
+footer{background:#e4eaf1;border-top:1px solid #d1dce7;margin-top:25px;padding:23px 0 28px}
+.footer-inner{display:flex;gap:24px;justify-content:space-between;align-items:start;font-size:12px;color:var(--muted)}
+.footer-inner strong{color:var(--ink);font-weight:650}
+.footer-inner p{margin:0 0 4px}
+.footer-note{max-width:370px;text-align:right}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;border:1px solid #6d95be;border-radius:7px;box-shadow:0 5px 25px #061b3433;padding:12px 20px;font-size:14px;z-index:9;max-width:90vw}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@keyframes print-in{from{opacity:.35;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@media(min-width:1400px){.hero{padding-top:49px;padding-bottom:132px}.workspace{margin-top:-84px}}
+@media(max-width:850px){.wrap{padding:0 22px}.workspace{gap:20px;grid-template-columns:1fr 1fr}.hero{gap:25px}.hero-note p{font-size:16px}.receipt{padding:23px}.search-title{padding:22px}.tabs{margin:0 22px}.form-inner{padding:22px}.fields{grid-template-columns:minmax(0,1fr) 82px}.source-section{gap:20px}.independent{display:none}.price{font-size:62px}}
+@media(max-width:670px){.wrap{padding:0 20px}.nav{min-height:72px}.navlinks{gap:18px}.navlinks .decoder-link{display:none}.hero{display:block;padding:30px 0 86px}h1{font-size:44px;letter-spacing:-1.8px}.hero-note{justify-self:start;max-width:100%;margin-top:21px}.hero-note p{font-size:15px;line-height:1.6;margin-bottom:6px}.hero-note small{font-size:12px}.workspace{grid-template-columns:1fr;margin-top:-48px;gap:28px}.paper-column{grid-row:2}.steps{display:none}.search-title{padding:21px 23px 16px}.tabs{margin:0 23px}.form-inner{padding:21px 23px 23px}.fields{grid-template-columns:minmax(0,1fr) 93px}.receipt{padding:25px 26px}.receipt h2{font-size:26px}.price{font-size:75px}.source-section{grid-template-columns:1fr;gap:20px;margin-top:50px;padding-top:23px}.source-section h2{margin-bottom:0}.about-content{grid-template-columns:1fr;gap:12px}.footer-inner{display:block}.footer-note{text-align:left;max-width:none;margin-top:17px}.status{margin-left:23px;margin-right:23px}.candidates{padding-left:23px;padding-right:23px}}
+@media(max-width:360px){.wrap{padding:0 13px}.navlinks{font-size:12px;gap:12px}.brand{font-size:14px}h1{font-size:38px}.receipt{padding:23px 20px}.price{font-size:67px}.tabs{margin:0 18px}.form-inner{padding:20px 18px}.tab{font-size:14px}.facility{gap:6px 10px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.receipt{animation:none}}
+@media print{body{background:white}.masthead,.input-column,.source-section,.about,.receipt-actions,.terminology,footer,.copy,.toast{display:none!important}.workspace{display:block;margin:0}.wrap{padding:0}.receipt{box-shadow:none;max-width:650px;margin:auto}.printer-slot{display:none}.receipt:after{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#lookup">Skip to price lookup</a>
+<svg class="sr-only" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-pill" viewBox="0 0 24 24"><path d="m9 4-5 5a7.07 7.07 0 0 0 10 10l5-5A7.07 7.07 0 0 0 9 4Zm-2.5 2.5 11 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="icon-procedure" viewBox="0 0 24 24"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8zM8 13h8m-4-3v6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="icon-receipt" viewBox="0 0 48 54"><path d="M8 3h32v48l-8-5-8 5-8-5-8 5V3Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15h18M15 24h18M15 33h10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+<header class="masthead">
+  <div class="wrap">
+    <nav class="nav" aria-label="Main navigation">
+      <a href="./" class="brand"><svg aria-hidden="true"><use href="#icon-receipt"/></svg>BEFORE YOU PAY</a>
+      <div class="navlinks"><a class="decoder-link" href="../">Decode a health code ↗</a><a href="#sources">Sources &amp; notes</a><span class="independent">An independent project</span></div>
+    </nav>
+    <div class="hero">
+      <div><p class="eyebrow">Health prices, in plain sight</p><h1>Know the number.<br><span>Before you pay.</span></h1></div>
+      <div class="hero-note"><p>A medication. A planned procedure.<br>Real price records. A better question to ask.</p><small>No sign-up. No uploads. Just a place to start.</small></div>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="workspace" id="lookup" aria-label="Price lookup">
+    <div class="input-column">
+      <div class="search-card">
+        <div class="search-title"><h2>What are you checking?</h2><span class="step-label">01 / LOOK UP</span></div>
+        <div class="tabs" role="tablist" aria-label="Type of price">
+          <button id="med-tab" class="tab" role="tab" aria-selected="true" aria-controls="med-panel" type="button"><svg aria-hidden="true"><use href="#icon-pill"/></svg>A medication</button>
+          <button id="proc-tab" class="tab" role="tab" aria-selected="false" aria-controls="proc-panel" tabindex="-1" type="button"><svg aria-hidden="true"><use href="#icon-procedure"/></svg>A procedure</button>
+        </div>
+        <div id="med-panel" role="tabpanel" aria-labelledby="med-tab">
+          <form id="med-form" class="form-inner">
+            <div class="fields">
+              <div><label class="field-label" for="med-name">Generic medication name</label><input id="med-name" name="medication" placeholder="e.g. amitriptyline" maxlength="80" required autocomplete="off" spellcheck="false" aria-describedby="med-hint"></div>
+              <div><label class="field-label" for="med-qty">Quantity</label><input id="med-qty" name="quantity" type="number" inputmode="numeric" min="1" max="1000" step="1" value="30" required aria-describedby="med-hint"></div>
+            </div>
+            <p id="med-hint" class="field-hint">Tablets &amp; capsules. Use the name on your prescription.</p>
+            <button type="submit" class="primary" id="med-submit"><span>Find my medication</span><svg aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+            <div class="examples"><span>Try a name</span><button class="example" type="button" data-med="amitriptyline">Amitriptyline</button><button class="example" type="button" data-med="atorvastatin">Atorvastatin</button><button class="example" type="button" data-med="metformin">Metformin</button></div>
+            <p class="form-note">Next, choose the exact strength and form. Prices come from Cost Plus Drugs; shipping and any tax are extra.</p>
+          </form>
+        </div>
+        <div id="proc-panel" role="tabpanel" aria-labelledby="proc-tab" hidden>
+          <form id="proc-form" class="form-inner">
+            <div class="fields">
+              <div><label class="field-label" for="proc-name">Procedure or billing code</label><input id="proc-name" name="procedure" placeholder="e.g. MRI brain" maxlength="120" required autocomplete="off" aria-describedby="proc-hint"></div>
+              <div><label class="field-label" for="proc-zip">ZIP code</label><input id="proc-zip" name="zip" placeholder="33101" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" required autocomplete="off" aria-describedby="proc-hint"></div>
+            </div>
+            <p id="proc-hint" class="field-hint">Use the procedure on your order, not a symptom.</p>
+            <button type="submit" class="primary" id="proc-submit"><span>Find published prices</span><svg aria-hidden="true"><use href="#icon-arrow"/></svg></button>
+            <div class="examples"><span>Try a name</span><button class="example" type="button" data-proc="MRI brain">MRI brain</button><button class="example" type="button" data-proc="colonoscopy">Colonoscopy</button></div>
+            <p class="form-note">Hospital-published cash records via FairVisitHealth. Coverage varies; prices may include different services. Confirm before care.</p>
+          </form>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+        <div id="candidates" class="candidates" hidden></div>
+      </div>
+      <div class="steps" aria-label="How it works">
+        <div class="step"><span class="step-num">01</span><p><strong>Start with the name.</strong>A medication label or the procedure on your order.</p></div>
+        <div class="step"><span class="step-num">02</span><p><strong>Make sure it matches.</strong>Confirm the item before putting a price next to it.</p></div>
+        <div class="step"><span class="step-num">03</span><p><strong>Take a better question with you.</strong>Copy a short question to ask your pharmacy or provider.</p></div>
+      </div>
+    </div>
+    <div class="paper-column">
+      <div class="printer-slot" aria-hidden="true"></div>
+      <div id="receipt" class="receipt" aria-label="Price record" aria-busy="false"></div>
+      <p class="sr-only" id="result-announcement" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+  <section class="source-section" id="sources" aria-labelledby="sources-title">
+    <div><span class="eyebrow">Follow the data</span><h2 id="sources-title">Names meet numbers.</h2><p>Every dollar has a source.<br>Every code has a context.</p></div>
+    <div><h3>The names</h3><p><a href="https://www.nlm.nih.gov/research/umls/rxnorm/">NLM RxNorm</a> provides normalized medication names. <a href="https://cartos.healthit.gov/TerminologyBrowser/vpc/termsearch">ONC CARTOS</a> can check the terminology. Open the terminology detail on a medication receipt to explore the connection.</p></div>
+    <div><h3>The numbers</h3><p><a href="https://costplusdrugs.github.io/apidocs/">Cost Plus Drugs</a> supplies one seller’s medication prices. <a href="https://fairvisithealth.com">FairVisitHealth</a> supplies hospital-published cash records. These are starting points for a conversation about price.</p></div>
+  </section>
+  <details class="about" id="about">
+    <summary>About the prices, privacy &amp; terminology license</summary>
+    <div class="about-content">
+      <div><h3>Read the fine print first</h3><p>Medication prices are API estimates for the selected item and quantity, excluding shipping and any applicable tax. Check the seller’s current product page and prescription requirements. One seller is shown; this is not a lowest-price guarantee or an insurance estimate.</p><p>Hospital records may exclude clinician, facility or other separately billed services. They are not a quote, a bill or a Good Faith Estimate. Confirm the exact procedure and get a written total from the facility. Prices do not describe quality, suitability or medical necessity.</p><p>FairVisitHealth’s free service currently allows 60 lookups per IP address per day. No automatic retries are made. Missing records are shown as missing, not filled with an invented number.</p></div>
+      <div><h3>Your search &amp; the license</h3><p>This page has no account, analytics, uploads or saved search history. When you submit a search, it goes directly to the named price provider. Opening medication terminology sends that product name to NLM, and its code to CARTOS when you request verification. Those services and the hosting provider have their own privacy policies and logs. Please do not enter names, medical records or other identifying information.</p><p>Created by <strong>Jeffrey A. Brick</strong>, UMLS license holder. License approval: September 3, 2026. This page uses public API access; no private UMLS credentials are included.</p><p>The creator’s UMLS license does not transfer terminology rights to visitors. Terminology and pricing data remain subject to their respective providers’ terms. The project’s MIT license covers its code only. Independent project; not affiliated with or endorsed by ONC, HHS or NLM.</p><p><a href="https://www.nlm.nih.gov/research/umls/">UMLS information</a> · <a href="../LICENSE">Code license</a> · <a href="https://github.com/jbrick2070/health-code-decoder">View the source</a></p></div>
+    </div>
+  </details>
+</main>
+<footer><div class="wrap footer-inner"><div><p>Created by <strong>Jeffrey A. Brick</strong></p><p>UMLS license holder · Approved September 3, 2026</p></div><div class="footer-note"><p>A little clarity before your next health expense.</p><p>Not affiliated with or endorsed by ONC, HHS or NLM.</p></div></div></footer>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<noscript><p style="padding:20px;text-align:center">JavaScript is needed for price lookups. You can visit <a href="https://www.costplusdrugs.com">Cost Plus Drugs</a> or <a href="https://fairvisithealth.com">FairVisitHealth</a> directly.</p></noscript>
+<script>
+"use strict";
+const ENDPOINTS = {
+  medication: "https://us-central1-costplusdrugs-publicapi.cloudfunctions.net/main",
+  procedure: "https://sytjhslzedcesudozwwm.supabase.co/functions/v1/public-price-lookup",
+  rxnorm: "https://rxnav.nlm.nih.gov/REST/",
+  cartos: "https://cartos.healthit.gov/TerminologyServer/R4/"
+};
+const EXAMPLE = {
+  medication_name: "Amitriptyline", strength: "10mg", form: "Tablet", pill_nonpill: "Pill",
+  ndc: "29300041901", requested_quote: "$5.97", requested_quote_units: "30",
+  url: "https://www.costplusdrugs.com/medications/amitriptyline-10mg-tablet/"
+};
+const EXAMPLE_DATE = "2026-09-04";
+const $ = id => document.getElementById(id);
+const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]));
+const money = number => new Intl.NumberFormat("en-US", {style:"currency", currency:"USD", maximumFractionDigits:2}).format(number);
+const icon = name => '<svg aria-hidden="true"><use href="#icon-' + name + '"/></svg>';
+let mode = "med", lookupVersion = 0, viewVersion = 0, lookupController = null, termController = null;
+let medicationChoices = [], pendingProcedure = null, activeProcedure = null, activeMedication = null, questionText = "", toastTimer;
+
+function parsePrice(value) {
+  if (typeof value === "number") return Number.isFinite(value) && value >= 0 ? value : null;
+  if (typeof value !== "string" || !/^\$?\s*\d+(?:,\d{3})*(?:\.\d{1,2})?$/.test(value.trim())) return null;
+  const number = Number(value.replace(/[$,\s]/g, ""));
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+function medicationRows(body, quantity) {
+  if (!Array.isArray(body?.results)) throw new Error("The pharmacy returned an unreadable result. Please try again later.");
+  return body.results.filter(row => row && typeof row.medication_name === "string" && row.medication_name &&
+    typeof row.strength === "string" && row.strength && /tablet|capsule/i.test(row.form || "") &&
+    !row.error_message && Number(row.requested_quote_units) === quantity && parsePrice(row.requested_quote) !== null)
+    .sort((a,b) => (a.medication_name + " " + a.strength + " " + a.form).localeCompare(b.medication_name + " " + b.strength + " " + b.form, "en", {numeric:true}));
+}
+function facilityRows(body) {
+  return (Array.isArray(body?.facilities) ? body.facilities : [])
+    .filter(row => row && typeof row.name === "string" && parsePrice(row.cash_price) !== null)
+    .map(row => ({...row, price:parsePrice(row.cash_price)}))
+    .sort((a,b) => a.name.localeCompare(b.name, "en"));
+}
+function dateLabel(value, options) {
+  if (!value) return "Date not supplied";
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(String(value));
+  const input = dateOnly ? value + "T12:00:00Z" : value;
+  const date = new Date(input);
+  return Number.isNaN(date.getTime()) ? "Date not supplied" : date.toLocaleDateString("en-US", {...(options || {month:"short",day:"numeric",year:"numeric"}), ...(dateOnly ? {timeZone:"UTC"} : {})});
+}
+function productLink(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol === "https:" && ["www.costplusdrugs.com","costplusdrugs.com"].includes(url.hostname) && url.pathname.startsWith("/medications/")) return url.href;
+  } catch {}
+  return "https://www.costplusdrugs.com/medications/";
+}
+function external(url, label) {
+  return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(label) + ' ↗</a>';
+}
+function status(message, kind = "info") {
+  $("status").hidden = !message;
+  $("status").textContent = message || "";
+  $("status").dataset.kind = kind;
+}
+function toast(message) {
+  clearTimeout(toastTimer);
+  $("toast").textContent = message; $("toast").hidden = false;
+  toastTimer = setTimeout(() => { $("toast").hidden = true; }, 4500);
+}
+function cancelLookups() {
+  lookupVersion++;
+  lookupController?.abort();
+  termController?.abort();
+  lookupController = null; termController = null;
+  $("med-submit").disabled = false; $("proc-submit").disabled = false;
+  $("receipt").setAttribute("aria-busy","false");
+}
+function newView() {
+  termController?.abort(); termController = null;
+  viewVersion++; activeMedication = null; activeProcedure = null; questionText = "";
+  $("result-announcement").textContent = "";
+}
+function announce(text) { $("result-announcement").textContent = text; }
+function revealReceipt() {
+  if (window.matchMedia?.("(max-width: 670px)").matches) {
+    $("receipt").scrollIntoView({block:"start", behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"});
+  }
+}
+function placeholder(title, message) {
+  newView();
+  $("receipt").innerHTML = '<div class="receipt-top"><span class="receipt-label">Your price record</span><span class="stamp">Before<br>you pay</span></div><div class="pending-receipt">' +
+    icon("receipt") + '<h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(message) + '</p></div>';
+}
+function switchMode(next) {
+  if (mode === next) return;
+  cancelLookups(); mode = next;
+  for (const item of ["med","proc"]) {
+    $(item + "-tab").setAttribute("aria-selected", String(item === mode));
+    $(item + "-tab").tabIndex = item === mode ? 0 : -1;
+    $(item + "-panel").hidden = item !== mode;
+  }
+  medicationChoices = []; pendingProcedure = null;
+  $("candidates").hidden = true; status("");
+  if (mode === "med") renderMedication(EXAMPLE, 30, EXAMPLE_DATE, true);
+  else placeholder("A procedure. A clearer starting point.", "Enter the procedure on your order and a ZIP code. You will confirm the matched procedure before seeing its published cash records.");
+}
+async function fetchJson(url, signal, service, timeout = 20000) {
+  const controller = new AbortController();
+  let timedOut = false;
+  const abort = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  else signal?.addEventListener("abort", abort, {once:true});
+  const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeout);
+  try {
+    const response = await fetch(url, {signal:controller.signal, credentials:"omit", referrerPolicy:"no-referrer"});
+    if (response.status === 429) throw new Error(service === "FairVisitHealth" ?
+      "FairVisitHealth’s daily lookup limit has been reached for this internet connection. Please try again tomorrow." :
+      service + " is limiting requests right now. Please try again later.");
+    if (response.status === 404 && service === "FairVisitHealth") throw new Error("No procedure matched. Try the billing code on your order, or a plainer name such as “MRI brain.”");
+    if (!response.ok) throw new Error(service + " could not complete this lookup (HTTP " + response.status + "). Please try again later.");
+    const body = await response.json();
+    if (body?.ok === false) throw new Error("No price record was returned. Check the name or code and try again.");
+    return body;
+  } catch (error) {
+    if (timedOut) throw new Error(service + " took too long to answer. Your lookup has stopped; you can try again.");
+    if (error.name === "AbortError") throw error;
+    if (error instanceof TypeError || error instanceof SyntaxError) throw new Error("Could not read a response from " + service + ". Check your connection or try again later.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener("abort", abort);
+  }
+}
+function startLookup() {
+  cancelLookups();
+  const version = lookupVersion;
+  lookupController = new AbortController();
+  $("candidates").hidden = true;
+  $("receipt").setAttribute("aria-busy","true");
+  $(mode + "-submit").disabled = true;
+  return {version, signal:lookupController.signal};
+}
+function finishLookup(version) {
+  if (version !== lookupVersion) return;
+  $(mode + "-submit").disabled = false;
+  $("receipt").setAttribute("aria-busy","false");
+}
+async function searchMedication(event) {
+  event?.preventDefault();
+  const name = $("med-name").value.trim(), quantity = Number($("med-qty").value);
+  if (name.length < 2 || !Number.isInteger(quantity) || quantity < 1 || quantity > 1000) {
+    status("Enter a medication name and a whole-number quantity from 1 to 1,000.", "error"); return;
+  }
+  const request = startLookup();
+  medicationChoices = [];
+  placeholder("Checking the pharmacy.", "Looking for the name and quantity you entered. You will choose the exact strength and form next.");
+  status("Checking Cost Plus Drugs…");
+  try {
+    const url = new URL(ENDPOINTS.medication);
+    url.search = new URLSearchParams({medication_name:name, quantity_units:String(quantity)}).toString();
+    const body = await fetchJson(url, request.signal, "Cost Plus Drugs");
+    if (request.version !== lookupVersion) return;
+    const rows = medicationRows(body, quantity);
+    if (!rows.length) {
+      status("No tablet or capsule price was found for that name and quantity. Try the generic name on your prescription. Brand substitutions are not made here.", "error");
+      placeholder("No price to print yet.", "Not every medication is available from this seller. You can try another name or check the pharmacy directly."); return;
+    }
+    const retrieved = new Date().toISOString();
+    medicationChoices = rows.map(row => ({row, quantity, retrieved}));
+    $("candidates").innerHTML = '<h3>02 / Choose your exact strength &amp; form</h3><p class="confirm-note">Match your prescription. Selecting a row shows its price; it does not recommend a medication or dose.</p><div class="candidate-list" role="radiogroup" aria-label="Matching medications">' +
+      rows.map((row,index) => '<label class="candidate"><input type="radio" name="matched-medication" value="' + index + '"><span><strong>' +
+      escapeHtml(row.medication_name + " " + row.strength) + '</strong>' + escapeHtml(row.form) + ' · ' + quantity +
+      ' ' + (/capsule/i.test(row.form) ? "capsules" : "tablets") + (row.ndc ? '<br><small>NDC ' + escapeHtml(row.ndc) + '</small>' : "") + '</span></label>').join("") + '</div>';
+    $("candidates").hidden = false;
+    status(rows.length + (rows.length === 1 ? " match found. Confirm it below." : " matches found. Choose the item on your prescription."));
+    placeholder("The exact item matters.", "Choose the medication’s strength and form in the list. The price will appear here for " + quantity + " tablets or capsules.");
+    announce("Medication matches are ready. Choose your exact strength and form.");
+  } catch (error) {
+    if (request.version !== lookupVersion || error.name === "AbortError") return;
+    status(error.message,"error");
+    placeholder("The lookup could not finish.", "No price was assumed. See the message beside the search and try again when ready.");
+  } finally { finishLookup(request.version); }
+}
+function questionBlock(text) {
+  questionText = text;
+  return '<section class="question"><div class="question-head"><h3>Ask this before you pay</h3><button class="copy" type="button" data-action="copy">Copy question</button></div><blockquote id="price-question">' + escapeHtml(text) + '</blockquote></section>';
+}
+function renderMedication(row, quantity, retrieved, sample = false) {
+  newView();
+  const price = parsePrice(row.requested_quote);
+  if (price === null || Number(row.requested_quote_units) !== quantity) {
+    placeholder("That quantity needs a fresh lookup.", "No price was calculated from unit prices. Search again for a quote for your exact quantity."); return;
+  }
+  activeMedication = {row, quantity, retrieved, sample};
+  const units = /capsule/i.test(row.form) ? "capsules" : "tablets";
+  const question = "For " + quantity + " " + units + " of " + row.medication_name + " " + row.strength +
+    ", what is the total cash price, including all fees, shipping and any tax? Can you confirm the exact product and prescription requirements?";
+  $("receipt").innerHTML =
+    '<div class="receipt-top"><span class="receipt-label">Cost Plus Drugs<br>Medication price record</span><span class="stamp">' +
+    (sample ? "Saved example" : "API response") + '<br>' + escapeHtml(dateLabel(retrieved)) + '</span></div>' +
+    '<h2>' + escapeHtml(row.medication_name) + '</h2><p class="receipt-subtitle">' + (sample ? 'A real, saved lookup. Refresh to check the price now.' : 'Selected by you. Match these details to your prescription.') + '</p>' +
+    '<dl class="line-items"><div><dt>Strength / form</dt><dd>' + escapeHtml(row.strength + " / " + row.form) + '</dd></div><div><dt>Quantity quoted</dt><dd>' + quantity + ' ' + units +
+    '</dd></div><div><dt>Price type</dt><dd>Seller API estimate</dd></div></dl>' +
+    '<div class="price-line"><div><p class="price-label">Medication price</p><div class="price">' + money(price) + '</div></div><span class="price-mark">' + icon("pill") + '</span></div>' +
+    '<p class="extra">+ shipping &amp; any applicable tax</p>' +
+    '<div class="source-line">' + external(productLink(row.url), "Check the seller’s product page") + '<span>Source: Cost Plus Drugs</span></div>' +
+    '<p class="subtle">One seller. No lowest-price guarantee. This is not an insurance or delivered-price estimate. Confirm the current total with the pharmacy.</p>' +
+    '<div class="receipt-actions"><button type="button" class="outline-button" data-action="refresh-med">' + (sample ? "Check this price now" : "Refresh this lookup") + '</button><button type="button" class="text-button" data-action="print">Print / save PDF</button></div>' +
+    questionBlock(question) +
+    '<div class="terminology"><button type="button" class="text-button" data-action="terminology" id="term-button" aria-expanded="false" aria-controls="term-result">See the terminology connection +</button><div class="term-result" id="term-result" hidden></div></div>' +
+    '<p class="subtle">' + (sample ? "Example captured September 4, 2026. No lookup runs until you ask." : 'Retrieved ' + escapeHtml(new Date(retrieved).toLocaleString("en-US", {dateStyle:"medium",timeStyle:"short"})) + '. The provider may cache its prices.') + '</p>';
+  if (!sample) announce(row.medication_name + " " + row.strength + ", " + quantity + " " + units + ": " + money(price) + ", plus shipping and any tax.");
+}
+async function searchProcedure(event) {
+  event?.preventDefault();
+  const query = $("proc-name").value.trim(), zip = $("proc-zip").value.trim();
+  if (query.length < 2 || !/^\d{5}$/.test(zip)) {
+    status("Enter a procedure name or code and a five-digit ZIP code.", "error"); return;
+  }
+  const request = startLookup();
+  pendingProcedure = null;
+  placeholder("Finding the procedure.", "Checking published price records for this name or code. You will confirm the procedure before viewing the dollars.");
+  status("Checking FairVisitHealth…");
+  try {
+    const url = new URL(ENDPOINTS.procedure), params = new URLSearchParams({zip});
+    params.set(/^(?:\d{5}|[A-Z]\d{4})$/i.test(query) ? "cpt" : "query", query);
+    url.search = params.toString();
+    const body = await fetchJson(url, request.signal, "FairVisitHealth");
+    if (request.version !== lookupVersion) return;
+    if (!body?.procedure?.name || !body?.procedure?.code) throw new Error("The source did not return a procedure we can confirm. Try the billing code on your order.");
+    pendingProcedure = {body, query, zip, retrieved:new Date().toISOString()};
+    $("candidates").innerHTML = '<h3>02 / Is this the procedure on your order?</h3><p class="confirm-name"><strong>' +
+      escapeHtml(body.procedure.name) + '</strong><small>Billing code ' + escapeHtml(body.procedure.code) + ' · ZIP ' + escapeHtml(zip) + '</small></p>' +
+      '<p class="confirm-note">Check the code and exact version with your provider, including details such as contrast or additional services. A similar name may be a different procedure.</p>' +
+      '<button type="button" class="primary" data-action="confirm-procedure"><span>Yes, show these price records</span>' + icon("arrow") + '</button>';
+    $("candidates").hidden = false;
+    status(body.procedure.match === "exact" ? "A procedure matched. Confirm the exact version below." : "The source suggested a match. Check it carefully before continuing.");
+    placeholder("First, check the name.", "Confirm that the matched procedure is the one on your order. Its published cash records will appear here.");
+    announce("A procedure match is ready for your confirmation.");
+  } catch (error) {
+    if (request.version !== lookupVersion || error.name === "AbortError") return;
+    status(error.message,"error");
+    placeholder("No price record to print.", "The lookup did not return a usable result. Try the exact code or a simpler procedure name.");
+  } finally { finishLookup(request.version); }
+}
+function renderProcedure(record) {
+  newView();
+  activeProcedure = record;
+  const {body, zip, retrieved} = record, rows = facilityRows(body);
+  const name = String(body.procedure.name), code = String(body.procedure.code);
+  const prices = rows.map(row => row.price), maximum = rows.length ? Math.max(...prices) : 0, minimum = rows.length ? Math.min(...prices) : 0;
+  const scope = body.facility_scope === "state" ? "The provider widened these results to the state level. They may be outside your ZIP area." :
+    body.facility_scope === "radius" ? "Records returned for ZIP " + zip + ". Check each facility’s address and exact service." :
+    "Location scope was not confirmed by the provider. Check each facility’s location.";
+  const question = "For " + name + " (billing code " + code + "), can you give me a written total cash estimate, including facility, clinician and any separately billed services? What is included, and what could cost extra?";
+  $("receipt").innerHTML =
+    '<div class="receipt-top"><span class="receipt-label">Hospital cash records<br>via FairVisitHealth</span><span class="stamp">API response<br>' + escapeHtml(dateLabel(retrieved)) + '</span></div>' +
+    '<h2>' + escapeHtml(name) + '</h2><p class="receipt-subtitle">Billing code ' + escapeHtml(code) + ' · Search ZIP ' + escapeHtml(zip) + '</p>' +
+    (rows.length ? '<p class="price-label">Range across these published records</p><div class="price-range">' + money(minimum) + (maximum !== minimum ? " – " + money(maximum) : "") + '</div><p class="scope-note">' +
+      rows.length + ' returned record' + (rows.length === 1 ? "" : "s") + '. Included services may differ.</p><div class="facilities" aria-label="Hospital-published cash prices, alphabetical by facility">' +
+      rows.map(row => '<article class="facility"><div><h3>' + escapeHtml(row.name) + '</h3><p>' +
+        escapeHtml([row.city,row.state].filter(Boolean).join(", ")) + '</p><p>Record updated ' + escapeHtml(dateLabel(row.last_updated)) + '</p></div><span class="amount">' +
+        money(row.price) + '</span><div class="bar-track" aria-hidden="true"><span class="bar" style="width:' +
+        (maximum > 0 ? Math.max(2,Math.min(100,row.price/maximum*100)).toFixed(2) : "0") + '%"></span></div></article>').join("") + '</div>' :
+      '<div class="pending-receipt"><h2>No facility cash records returned.</h2><p>That does not mean the procedure is unavailable. Ask your facility for a written cash estimate.</p></div>') +
+    '<p class="subtle">' + escapeHtml(scope) + '</p><p class="subtle"><strong>Inclusions not supplied.</strong> These records may cover different parts of care. They are not quotes, insurance estimates or Good Faith Estimates. Confirm with the facility.</p>' +
+    '<div class="source-line">' + external("https://fairvisithealth.com", "Source: FairVisitHealth") + '<span>Hospital-published cash prices</span></div>' +
+    (body.disclaimer ? '<details class="subtle"><summary>Provider’s data note</summary><p>' + escapeHtml(body.disclaimer) + '</p></details>' : "") +
+    questionBlock(question) +
+    '<div class="receipt-actions"><button type="button" class="outline-button" data-action="refresh-procedure">Refresh this lookup</button><button type="button" class="text-button" data-action="print">Print / save PDF</button></div>' +
+    '<p class="subtle">Retrieved ' + escapeHtml(new Date(retrieved).toLocaleString("en-US", {dateStyle:"medium",timeStyle:"short"})) + '. Individual record dates are shown above. List order is alphabetical, not a recommendation.</p>';
+  announce(rows.length ? rows.length + " published cash records, from " + money(minimum) + " to " + money(maximum) + ". Inclusions may differ." : "No facility cash records were returned.");
+}
+async function loadTerminology() {
+  if (!activeMedication) return;
+  const version = viewVersion, {row} = activeMedication;
+  termController?.abort(); termController = new AbortController();
+  const signal = termController.signal;
+  $("term-result").hidden = false; $("term-button").disabled = true; $("term-button").setAttribute("aria-expanded","true");
+  $("term-result").textContent = "Checking the selected name in NLM RxNorm…";
+  try {
+    const url = new URL(ENDPOINTS.rxnorm + "rxcui.json");
+    url.search = new URLSearchParams({name:row.medication_name + " " + row.strength + " " + row.form, search:"2"}).toString();
+    const match = await fetchJson(url, signal, "NLM RxNorm");
+    const ids = match?.idGroup?.rxnormId;
+    if (!Array.isArray(ids) || ids.length !== 1 || !/^\d+$/.test(String(ids[0]))) throw new Error("No single normalized product match was found. The pharmacy price still refers to the item you selected.");
+    const code = String(ids[0]);
+    const result = await fetchJson(ENDPOINTS.rxnorm + "rxcui/" + code + "/properties.json", signal, "NLM RxNorm");
+    if (version !== viewVersion) return;
+    const properties = result?.properties;
+    if (!properties?.name || !["SCD","SBD","GPCK","BPCK"].includes(properties.tty)) throw new Error("RxNorm did not return a specific clinical drug or pack. No exact product terminology match is claimed.");
+    $("term-result").innerHTML = '<p><strong>NLM normalized name</strong><br>' + escapeHtml(properties.name) + '</p><p>RxNorm code <code>' + escapeHtml(code) +
+      '</code>' + (row.ndc ? ' · Seller NDC <code>' + escapeHtml(row.ndc) + '</code>' : "") +
+      '</p><p>The name lookup and seller record are shown side by side. This is not an NDC crosswalk, a substitution recommendation or a price supplied by NLM.</p>' +
+      '<button type="button" class="outline-button" id="cartos-button" data-action="cartos" data-code="' + escapeHtml(code) + '">Verify this code in CARTOS</button><div id="cartos-result" style="margin-top:12px"></div>';
+  } catch (error) {
+    if (version !== viewVersion || error.name === "AbortError") return;
+    $("term-result").textContent = error.message;
+  } finally { if (version === viewVersion && $("term-button")) $("term-button").disabled = false; }
+}
+async function verifyCartos(code) {
+  if (!/^\d+$/.test(code)) return;
+  const version = viewVersion;
+  termController?.abort(); termController = new AbortController();
+  $("cartos-button").disabled = true;
+  $("cartos-result").textContent = "Checking the public CARTOS terminology service…";
+  try {
+    const url = new URL(ENDPOINTS.cartos + "CodeSystem/$lookup");
+    url.search = new URLSearchParams({system:"http://www.nlm.nih.gov/research/umls/rxnorm", code, _format:"json"}).toString();
+    const body = await fetchJson(url, termController.signal, "CARTOS");
+    if (version !== viewVersion) return;
+    const parameters = Array.isArray(body?.parameter) ? body.parameter : [];
+    const display = parameters.find(item => item.name === "display")?.valueString;
+    if (!display) throw new Error("CARTOS did not return a display name for this code. The NLM result above remains available.");
+    $("cartos-result").innerHTML = '<p><strong>CARTOS recognizes this code</strong><br>' + escapeHtml(display) + '</p><p>' +
+      external("../#q=" + encodeURIComponent(code) + "&in=meds", "Explore it in Health Code Decoder") + '</p>';
+    $("cartos-button").hidden = true;
+  } catch (error) {
+    if (version !== viewVersion || error.name === "AbortError") return;
+    $("cartos-result").textContent = error.message;
+  } finally { if (version === viewVersion && $("cartos-button")) $("cartos-button").disabled = false; }
+}
+async function copyQuestion() {
+  if (!questionText) return;
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+    await navigator.clipboard.writeText(questionText);
+    toast("Question copied. Take it to your pharmacy or provider.");
+  } catch {
+    const target = $("price-question");
+    if (target) { const range = document.createRange(); range.selectNodeContents(target); const selection = window.getSelection(); selection?.removeAllRanges(); selection?.addRange(range); }
+    toast("The question is selected. Use your device’s Copy command.");
+  }
+}
+/* INITIALIZE */
+$("med-form").addEventListener("submit", searchMedication);
+$("proc-form").addEventListener("submit", searchProcedure);
+for (const item of ["med","proc"]) {
+  $(item + "-tab").addEventListener("click", () => switchMode(item));
+  $(item + "-tab").addEventListener("keydown", event => {
+    if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === "Home" ? "med" : event.key === "End" ? "proc" : mode === "med" ? "proc" : "med";
+    switchMode(next); $(next + "-tab").focus();
+  });
+  $(item + "-form").addEventListener("input", () => {
+    if (mode !== item) return;
+    cancelLookups();
+    medicationChoices = []; pendingProcedure = null; $("candidates").hidden = true;
+    status("Inputs changed. Submit the search to update the price record.");
+  });
+}
+$("candidates").addEventListener("change", event => {
+  if (event.target.name !== "matched-medication") return;
+  const selection = medicationChoices[Number(event.target.value)];
+  if (!selection) return;
+  renderMedication(selection.row, selection.quantity, selection.retrieved);
+  status("Your selected item is on the receipt. Check the details and the seller’s current total.");
+  revealReceipt();
+});
+document.addEventListener("click", event => {
+  const button = event.target.closest("button");
+  if (!button || button.disabled) return;
+  if (button.dataset.med) {
+    $("med-name").value = button.dataset.med;
+    $("med-form").requestSubmit(); return;
+  }
+  if (button.dataset.proc) {
+    $("proc-name").value = button.dataset.proc;
+    $("proc-name").dispatchEvent(new Event("input", {bubbles:true}));
+    $("proc-zip").focus();
+    toast("Procedure filled in. Add your ZIP code, then search."); return;
+  }
+  switch (button.dataset.action) {
+    case "copy": copyQuestion(); break;
+    case "print": window.print(); break;
+    case "terminology": loadTerminology(); break;
+    case "cartos": verifyCartos(button.dataset.code || ""); break;
+    case "refresh-med":
+      if (activeMedication) {
+        $("med-name").value = activeMedication.row.medication_name;
+        $("med-qty").value = String(activeMedication.quantity);
+        $("med-form").requestSubmit();
+      }
+      break;
+    case "confirm-procedure":
+      if (pendingProcedure) { renderProcedure(pendingProcedure); $("candidates").hidden = true; status("Published records are ready. Ask what each price includes before comparing."); revealReceipt(); }
+      break;
+    case "refresh-procedure":
+      if (activeProcedure) {
+        $("proc-name").value = activeProcedure.query; $("proc-zip").value = activeProcedure.zip;
+        $("proc-form").requestSubmit();
+      }
+      break;
+  }
+});
+renderMedication(EXAMPLE, 30, EXAMPLE_DATE, true);
+</script>
+</body>
+</html>

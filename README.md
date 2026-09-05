@@ -10,6 +10,8 @@ No account, key, or server is needed.
 
 **Live page:** https://jbrick2070.github.io/health-code-decoder/
 
+**Before You Pay:** [Medication and procedure price lookup](https://jbrick2070.github.io/health-code-decoder/before-you-pay/) — a separate, single-file page with a receipt interface, public price APIs, optional RxNorm/CARTOS terminology details, and Jeffrey A. Brick's UMLS license-holder attribution. See [its notes](before-you-pay/README.md).
+
 ## Run it
 
 Open `index.html` directly in a browser, or serve the folder:
